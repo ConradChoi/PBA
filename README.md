@@ -54,16 +54,29 @@ Call `trackEvent(name, params)` from `src/lib/analytics/ga4.ts` — it's a
 safe no-op during SSR or when `window.gtag` isn't available (e.g. no
 measurement ID configured, or an ad blocker).
 
-- `radar_landing_view` — wired via `<TrackPageView>` on the landing page
-- the remaining 7 events (`radar_start`, `radar_layer_complete`,
-  `radar_complete`, `radar_result_view`, `radar_pdf_request`,
-  `radar_consulting_click`, `radar_consulting_submit`) are declared but not
-  yet called — wire them into their corresponding screen as it's built.
+- `radar_landing_view` — landing page
+- `radar_start` — basic info submitted / draft created
+- `radar_layer_complete` — each layer's answers saved
+- `radar_complete` — diagnosis finished, assessment persisted
+- `radar_result_view` — result page viewed
+- `radar_pdf_request`, `radar_consulting_click`, `radar_consulting_submit` —
+  declared but not yet called; wait for Phase 2 / the consulting form.
 
 ## Scope of this codebase so far
 
 Implemented: project scaffold, Supabase client wiring, the scoring/level/
-bottleneck engine, the `assessments` write path, and GA4 setup (one event
-wired). **Not yet implemented** (future plans): the 28-question UI flow,
-the `/diagnose` route, the Radar chart, PDF generation, Resend email, the
-remaining GA4 events, and the consulting form.
+bottleneck engine, the `assessments` write path, GA4 setup, and the full
+`/diagnose` flow (basic info → 7-layer question wizard, resumable via
+server-persisted drafts → result page with Radar chart, summary,
+bottleneck/strength cards, and a 90-day priority timeline).
+
+**Not yet implemented** (future plans): Phase 2 (PDF generation, Resend
+email), the consulting request form (`radar_consulting_click`/
+`radar_consulting_submit`/`radar_pdf_request` events wait for it), a
+standalone privacy-policy page, and abandoned-draft cleanup (TTL/cron).
+
+**Known copy gaps** (intentional placeholders, not bugs — see
+`docs/superpowers/specs/2026-09-17-diagnose-flow-and-result-design.md`
+section D): `src/lib/content/layer-descriptions.ts` (all 7 layers) and 4
+of 7 entries in `src/lib/content/strength-copy.ts` read
+`[카피 필요: ...]`. Fill these in before a real launch.

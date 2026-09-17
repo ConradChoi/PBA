@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getAssessmentById } from "@/lib/assessments/get-assessment";
 import { RadarChart } from "@/components/diagnose/RadarChart";
+import { TrackResultView } from "@/components/diagnose/TrackResultView";
 import { ARCHITECTURE_LEVEL_COPY } from "@/lib/content/architecture-level-copy";
 import { BOTTLENECK_COPY } from "@/lib/content/bottleneck-copy";
 import { STRENGTH_COPY } from "@/lib/content/strength-copy";
@@ -47,6 +48,7 @@ export default async function ResultPage({
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-10">
+      <TrackResultView architectureLevel={level} />
       <header className="flex flex-col gap-1">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
           PBA 7-Layer Business Radar
