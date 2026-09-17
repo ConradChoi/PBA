@@ -1,13 +1,12 @@
 import type { LayerId } from "../types/assessment";
 
-// Nothing in the requirements spec to transcribe here -- all 7 are
-// placeholders, per design spec section D.
+// Drafted by the marketer agent from each layer's 4 questions (2026-09-17).
 export const LAYER_DESCRIPTIONS: Record<LayerId, string> = {
-  value: "[카피 필요: VALUE 설명 1줄]",
-  customer: "[카피 필요: CUSTOMER 설명 1줄]",
-  offer: "[카피 필요: OFFER 설명 1줄]",
-  experience: "[카피 필요: EXPERIENCE 설명 1줄]",
-  process: "[카피 필요: PROCESS 설명 1줄]",
-  data: "[카피 필요: DATA & INTELLIGENCE 설명 1줄]",
-  scale: "[카피 필요: SCALE 설명 1줄]",
+  value: "우리가 주는 가치와 고객이 원하는 가치가 같은지 점검합니다",
+  customer: "우리 고객이 정확히 누구이고 왜 사는지 점검합니다",
+  offer: "상품과 가격이 고객 여정에 맞게 짜여 있는지 점검합니다",
+  experience: "고객이 우리를 만나 재구매하기까지의 여정을 점검합니다",
+  process: "업무가 사람에게만 의존하지 않는 구조를 점검합니다",
+  data: "데이터를 어떻게 쌓고 어떻게 쓰는지 점검합니다",
+  scale: "다른 사람도 같은 품질을 낼 수 있는 구조인지 점검합니다",
 };
