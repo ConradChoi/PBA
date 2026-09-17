@@ -13,6 +13,7 @@ const BUSINESS_STAGES: { value: BusinessStage; label: string }[] = [
   { value: "operating", label: "운영 중" },
   { value: "growth", label: "성장" },
   { value: "realign", label: "재정비" },
+  { value: "other", label: "기타" },
 ];
 
 export default function DiagnosePage() {
@@ -22,6 +23,7 @@ export default function DiagnosePage() {
   const [companyName, setCompanyName] = useState("");
   const [role, setRole] = useState("");
   const [businessStage, setBusinessStage] = useState<BusinessStage | "">("");
+  const [businessStageOther, setBusinessStageOther] = useState("");
   const [industry, setIndustry] = useState("");
   const [teamSize, setTeamSize] = useState("");
   const [privacyConsent, setPrivacyConsent] = useState(false);
@@ -30,7 +32,13 @@ export default function DiagnosePage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canSubmit = name && email && businessStage && privacyConsent && !submitting;
+  const canSubmit =
+    name &&
+    email &&
+    businessStage &&
+    (businessStage !== "other" || businessStageOther.trim()) &&
+    privacyConsent &&
+    !submitting;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,6 +57,8 @@ export default function DiagnosePage() {
           companyName: companyName || undefined,
           role: role || undefined,
           businessStage,
+          businessStageOther:
+            businessStage === "other" ? businessStageOther : undefined,
           industry: industry || undefined,
           teamSize: teamSize || undefined,
         },
@@ -132,6 +142,18 @@ export default function DiagnosePage() {
             ))}
           </select>
         </label>
+
+        {businessStage === "other" && (
+          <label className="flex flex-col gap-1.5 text-sm">
+            <span className="font-medium text-slate-700">사업 단계 직접 입력 *</span>
+            <input
+              value={businessStageOther}
+              onChange={(e) => setBusinessStageOther(e.target.value)}
+              placeholder="현재 사업 단계를 입력해주세요"
+              className="rounded-lg border border-slate-200 px-3.5 py-2.5"
+            />
+          </label>
+        )}
 
         <label className="flex flex-col gap-1.5 text-sm">
           <span className="font-medium text-slate-700">업종 (선택)</span>

@@ -146,6 +146,7 @@ Hero:
   - 운영 중
   - 성장
   - 재정비
+  - 기타 (직접 입력)
 - 업종(선택)
 - 팀 규모(선택)
 - 월 매출 범위(선택; 초기 MVP에서는 제거 가능)
@@ -511,7 +512,8 @@ create table assessments (
   company_name text,
   role text,
   business_stage text not null
-    check (business_stage in ('idea','mvp_prep','building','operating','growth','realign')),
+    check (business_stage in ('idea','mvp_prep','building','operating','growth','realign','other')),
+  business_stage_other text,
   industry text,
   team_size text,
   score_value_raw smallint not null check (score_value_raw between 4 and 20),
@@ -546,7 +548,7 @@ create table assessments (
 );
 ```
 
-`business_stage` 매핑: `idea`=아이디어, `mvp_prep`=MVP 준비, `building`=구축 중, `operating`=운영 중, `growth`=성장, `realign`=재정비
+`business_stage` 매핑: `idea`=아이디어, `mvp_prep`=MVP 준비, `building`=구축 중, `operating`=운영 중, `growth`=성장, `realign`=재정비, `other`=기타(직접 입력, `business_stage_other` 컬럼에 저장)
 
 ## consulting_requests 테이블
 ```sql

@@ -4,7 +4,8 @@ export type BusinessStage =
   | "building"
   | "operating"
   | "growth"
-  | "realign";
+  | "realign"
+  | "other";
 
 export type ArchitectureLevel =
   | "IDEA_STAGE"
@@ -48,6 +49,7 @@ export type BasicInfo = {
   companyName?: string;
   role?: string;
   businessStage: BusinessStage;
+  businessStageOther?: string;
   industry?: string;
   teamSize?: string;
 };

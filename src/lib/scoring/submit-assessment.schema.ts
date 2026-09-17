@@ -15,6 +15,7 @@ export const businessStageSchema = z.enum([
   "operating",
   "growth",
   "realign",
+  "other",
 ]);
 
 export const layerIdSchema = z.enum([
@@ -27,15 +28,24 @@ export const layerIdSchema = z.enum([
   "scale",
 ]);
 
-export const basicInfoSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
-  companyName: z.string().optional(),
-  role: z.string().optional(),
-  businessStage: businessStageSchema,
-  industry: z.string().optional(),
-  teamSize: z.string().optional(),
-});
+export const basicInfoSchema = z
+  .object({
+    name: z.string().min(1),
+    email: z.string().email(),
+    companyName: z.string().optional(),
+    role: z.string().optional(),
+    businessStage: businessStageSchema,
+    businessStageOther: z.string().optional(),
+    industry: z.string().optional(),
+    teamSize: z.string().optional(),
+  })
+  .refine(
+    (data) => data.businessStage !== "other" || !!data.businessStageOther?.trim(),
+    {
+      message: "사업 단계를 '기타'로 선택한 경우 직접 입력해주세요.",
+      path: ["businessStageOther"],
+    }
+  );
 
 const utmSchema = z
   .object({

@@ -45,9 +45,21 @@ describe("computeAssessmentResult", () => {
 
     expect(result.row.company_name).toBeNull();
     expect(result.row.role).toBeNull();
+    expect(result.row.business_stage_other).toBeNull();
     expect(result.row.industry).toBeNull();
     expect(result.row.team_size).toBeNull();
     expect(result.row.utm_source).toBeNull();
+  });
+
+  it("carries business_stage_other through when business stage is 'other'", () => {
+    const input = allOnesInput();
+    input.basicInfo.businessStage = "other";
+    input.basicInfo.businessStageOther = "프랜차이즈 가맹 준비";
+
+    const result = computeAssessmentResult(input);
+
+    expect(result.row.business_stage).toBe("other");
+    expect(result.row.business_stage_other).toBe("프랜차이즈 가맹 준비");
   });
 
   it("stamps privacy consent fields on every result", () => {
@@ -81,5 +93,22 @@ describe("submitAssessmentSchema", () => {
 
     const parsed = submitAssessmentSchema.safeParse(invalid);
     expect(parsed.success).toBe(false);
+  });
+
+  it("rejects business stage 'other' without businessStageOther", () => {
+    const invalid = allOnesInput();
+    invalid.basicInfo.businessStage = "other";
+
+    const parsed = submitAssessmentSchema.safeParse(invalid);
+    expect(parsed.success).toBe(false);
+  });
+
+  it("accepts business stage 'other' with businessStageOther provided", () => {
+    const valid = allOnesInput();
+    valid.basicInfo.businessStage = "other";
+    valid.basicInfo.businessStageOther = "프랜차이즈 가맹 준비";
+
+    const parsed = submitAssessmentSchema.safeParse(valid);
+    expect(parsed.success).toBe(true);
   });
 });

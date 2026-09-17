@@ -23,6 +23,7 @@ export type AssessmentInsertRow = {
   company_name: string | null;
   role: string | null;
   business_stage: BasicInfo["businessStage"];
+  business_stage_other: string | null;
   industry: string | null;
   team_size: string | null;
   score_value_raw: number;
@@ -83,6 +84,7 @@ export function computeAssessmentResult(
     company_name: input.basicInfo.companyName ?? null,
     role: input.basicInfo.role ?? null,
     business_stage: input.basicInfo.businessStage,
+    business_stage_other: input.basicInfo.businessStageOther ?? null,
     industry: input.basicInfo.industry ?? null,
     team_size: input.basicInfo.teamSize ?? null,
     score_value_raw: get("value").raw,
