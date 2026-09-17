@@ -15,6 +15,9 @@ mix code, data, or branding between the two.
      it to the client)
 3. The database schema (`assessments`, `consulting_requests`, RLS policies,
    the `reports` storage bucket) lives in `supabase/migrations/0001_init.sql`.
+4. (Optional) Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` to your GA4 web stream's
+   measurement ID (Google Analytics → Admin → Data Streams → your stream).
+   Without it, no GA4 script loads.
 
 ## Commands
 
@@ -44,9 +47,23 @@ curl -X POST http://localhost:3000/api/assessments \
 Expected: `201` response with `"architectureLevel": "IDEA_STAGE"` and a new row
 visible in the `assessments` table in Supabase Studio.
 
+## GA4 events
+
+Event names are defined in `src/lib/analytics/events.ts` (spec section 21).
+Call `trackEvent(name, params)` from `src/lib/analytics/ga4.ts` — it's a
+safe no-op during SSR or when `window.gtag` isn't available (e.g. no
+measurement ID configured, or an ad blocker).
+
+- `radar_landing_view` — wired via `<TrackPageView>` on the landing page
+- the remaining 7 events (`radar_start`, `radar_layer_complete`,
+  `radar_complete`, `radar_result_view`, `radar_pdf_request`,
+  `radar_consulting_click`, `radar_consulting_submit`) are declared but not
+  yet called — wire them into their corresponding screen as it's built.
+
 ## Scope of this codebase so far
 
 Implemented: project scaffold, Supabase client wiring, the scoring/level/
-bottleneck engine, and the `assessments` write path. **Not yet implemented**
-(future plans): the 28-question UI flow, the `/diagnose` route, the Radar
-chart, PDF generation, Resend email, GA4 events, and the consulting form.
+bottleneck engine, the `assessments` write path, and GA4 setup (one event
+wired). **Not yet implemented** (future plans): the 28-question UI flow,
+the `/diagnose` route, the Radar chart, PDF generation, Resend email, the
+remaining GA4 events, and the consulting form.
