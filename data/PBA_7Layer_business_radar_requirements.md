@@ -1,7 +1,7 @@
 # PBA 7-Layer Business Radar 웹서비스 요구사항서
 Version: 1.0  
 Brand: `최종훈 PBA | Principal Business Architect`  
-Target domain: `radar.ylia.io`  
+Target domain: `pba.ylia.io`  
 Project type: 독립 신규 웹서비스  
 Important: **BARA 도형심리 역량진단과 완전히 별개의 시스템으로 개발한다.**
 
@@ -9,7 +9,7 @@ Important: **BARA 도형심리 역량진단과 완전히 별개의 시스템으�
 
 ## 0. Claude 작업 지시
 
-이 문서는 `radar.ylia.io`에서 운영할 **PBA 7-Layer Business Radar**의 제품/개발 요구사항이다.
+이 문서는 `pba.ylia.io`에서 운영할 **PBA 7-Layer Business Radar**의 제품/개발 요구사항이다.
 
 ### 반드시 지킬 것
 1. `bara-edu.kr` 또는 도형심리 관련 기능/데이터/브랜드를 절대 섞지 않는다.
@@ -87,7 +87,7 @@ MVP에서는 `PBA 7-Layer Business Radar` 사용.
 # 4. 전체 UX Flow
 
 ```text
-radar.ylia.io
+pba.ylia.io
     ↓
 Hero / 가치 제안
     ↓
@@ -618,7 +618,7 @@ File Storage: Supabase Storage
 PDF 생성 (Phase 2): 서버사이드 HTML→PDF 렌더링 후 Supabase Storage 업로드
 이메일 (Phase 2): Resend
 Deployment: Vercel 등
-Domain: radar.ylia.io
+Domain: pba.ylia.io
 ```
 
 단, 기존 ylia.io 인프라/호스팅과 충돌하지 않게 먼저 확인한다.
@@ -820,7 +820,7 @@ PROCESS/DATA/SCALE 저점
 
 # 27. 완료 기준(Acceptance Criteria)
 
-- [ ] `radar.ylia.io` 독립 프로젝트로 실행
+- [ ] `pba.ylia.io` 독립 프로젝트로 실행
 - [ ] BARA/도형심리 코드 또는 데이터 없음
 - [ ] 28문항 정상 동작
 - [ ] 모든 점수 공식 테스트 통과

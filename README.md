@@ -1,6 +1,6 @@
 # PBA 7-Layer Business Radar
 
-Independent MVP for `radar.ylia.io`. See `data/PBA_7Layer_business_radar_requirements.md`
+Independent MVP for `pba.ylia.io`. See `data/PBA_7Layer_business_radar_requirements.md`
 for the full spec. Completely separate from the BARA/도형심리 project — do not
 mix code, data, or branding between the two.
 
