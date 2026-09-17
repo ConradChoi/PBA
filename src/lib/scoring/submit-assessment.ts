@@ -7,10 +7,12 @@ import type {
 import { findBottlenecks, findStrengths } from "./bottleneck";
 import { classifyArchitectureLevel } from "./architecture-level";
 import { scoreAllLayers, totalRawScore } from "./scoring";
+import { PRIVACY_NOTICE_VERSION } from "../content/privacy-notice";
 
 export type SubmitAssessmentInput = {
   basicInfo: BasicInfo;
   answers: LayerAnswers;
+  privacyConsent: boolean;
   marketingConsent: boolean;
   utm?: { source?: string; medium?: string; campaign?: string };
 };
@@ -49,6 +51,9 @@ export type AssessmentInsertRow = {
   utm_source: string | null;
   utm_medium: string | null;
   utm_campaign: string | null;
+  privacy_consent: boolean;
+  privacy_consent_at: string;
+  privacy_notice_version: string;
   marketing_consent: boolean;
 };
 
@@ -106,6 +111,9 @@ export function computeAssessmentResult(
     utm_source: input.utm?.source ?? null,
     utm_medium: input.utm?.medium ?? null,
     utm_campaign: input.utm?.campaign ?? null,
+    privacy_consent: input.privacyConsent,
+    privacy_consent_at: new Date().toISOString(),
+    privacy_notice_version: PRIVACY_NOTICE_VERSION,
     marketing_consent: input.marketingConsent,
   };
 

@@ -26,6 +26,7 @@ function validPayload() {
       scale: [1, 1, 1, 1],
     },
     marketingConsent: false,
+    privacyConsent: true,
   };
 }
 

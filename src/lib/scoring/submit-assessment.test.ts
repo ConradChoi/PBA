@@ -20,6 +20,7 @@ function allOnesInput(): SubmitAssessmentInput {
       scale: [1, 1, 1, 1],
     },
     marketingConsent: false,
+    privacyConsent: true,
   };
 }
 
@@ -47,6 +48,16 @@ describe("computeAssessmentResult", () => {
     expect(result.row.industry).toBeNull();
     expect(result.row.team_size).toBeNull();
     expect(result.row.utm_source).toBeNull();
+  });
+
+  it("stamps privacy consent fields on every result", () => {
+    const result = computeAssessmentResult(allOnesInput());
+
+    expect(result.row.privacy_consent).toBe(true);
+    expect(result.row.privacy_notice_version).toBe("2026-09-17");
+    expect(new Date(result.row.privacy_consent_at).toString()).not.toBe(
+      "Invalid Date"
+    );
   });
 });
 
