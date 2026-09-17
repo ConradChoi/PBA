@@ -51,3 +51,19 @@ export type BasicInfo = {
   industry?: string;
   teamSize?: string;
 };
+
+export type DraftAnswers = Partial<LayerAnswers>;
+
+export type AssessmentDraftRow = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  basic_info: BasicInfo;
+  answers: DraftAnswers;
+  current_step: number;
+  privacy_consent: boolean;
+  marketing_consent: boolean;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+};
