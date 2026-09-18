@@ -1,6 +1,7 @@
 import { createAuthServerClient } from "../supabase/auth-server";
+import { parseOperatorRole, type OperatorRole } from "./operator-role";
 
-export type OperatorRole = "owner" | "staff";
+export type { OperatorRole };
 
 export type CurrentOperator = {
   id: string;
@@ -18,7 +19,11 @@ export async function getCurrentOperator(): Promise<CurrentOperator | null> {
     return null;
   }
 
-  const role = (user.app_metadata?.role as OperatorRole | undefined) ?? "staff";
+  const role = parseOperatorRole(user.app_metadata);
+
+  if (!role) {
+    return null;
+  }
 
   return { id: user.id, email: user.email, role };
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createAuthBrowserClient } from "@/lib/supabase/auth-browser";
+import { parseOperatorRole } from "@/lib/operators/operator-role";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -17,10 +18,20 @@ export default function AdminLoginPage() {
     setError(null);
 
     const supabase = createAuthBrowserClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     if (signInError) {
       setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+      setSubmitting(false);
+      return;
+    }
+
+    if (!parseOperatorRole(data.user.app_metadata)) {
+      await supabase.auth.signOut({ scope: "local" });
+      setError("운영자 권한이 없는 계정입니다.");
       setSubmitting(false);
       return;
     }

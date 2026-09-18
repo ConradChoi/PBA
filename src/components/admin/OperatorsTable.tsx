@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { OperatorListItem } from "@/lib/operators/list-operators";
-import type { OperatorRole } from "@/lib/operators/get-current-operator";
+import type { OperatorRole } from "@/lib/operators/operator-role";
 
 export function OperatorsTable({
   initialOperators,

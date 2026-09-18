@@ -1,5 +1,5 @@
 import { createServiceRoleSupabaseClient } from "../supabase/server";
-import type { OperatorRole } from "./get-current-operator";
+import { parseOperatorRole, type OperatorRole } from "./operator-role";
 
 export type OperatorListItem = {
   id: string;
@@ -17,11 +17,11 @@ export async function listOperators(): Promise<OperatorListItem[]> {
   }
 
   return data.users
-    .map((u) => ({
-      id: u.id,
-      email: u.email ?? "",
-      role: (u.app_metadata?.role as OperatorRole | undefined) ?? "staff",
-      created_at: u.created_at,
-    }))
+    .flatMap((u) => {
+      const role = parseOperatorRole(u.app_metadata);
+      return role
+        ? [{ id: u.id, email: u.email ?? "", role, created_at: u.created_at }]
+        : [];
+    })
     .sort((a, b) => a.created_at.localeCompare(b.created_at));
 }

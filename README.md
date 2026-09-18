@@ -67,8 +67,10 @@ measurement ID configured, or an ad blocker).
 ## Admin panel
 
 `/admin` is gated by Supabase Auth (`@supabase/ssr`, session refreshed in
-`middleware.ts`). Operators are Supabase Auth users; their role lives in
-`app_metadata.role` (`owner` or `staff`, defaulting to `staff`).
+`middleware.ts`). Operators are Supabase Auth users whose `app_metadata.role`
+is `owner` or `staff`; any other account is refused. Keep "Allow new users to
+sign up" off in Supabase (Authentication → Sign In / Providers) — operators
+are only ever created from `/admin/operators` or the Admin API.
 
 - `/admin/login` — email/password login
 - `/admin/consulting-requests` — requests submitted from the consult page.

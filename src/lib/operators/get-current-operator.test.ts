@@ -17,15 +17,33 @@ describe("getCurrentOperator", () => {
     expect(await getCurrentOperator()).toBeNull();
   });
 
-  it("defaults to staff role when app_metadata.role is missing", async () => {
+  it("returns null for a signed-in user without an operator role", async () => {
     getUser.mockResolvedValueOnce({
       data: { user: { id: "u1", email: "a@ylia.io", app_metadata: {} } },
     });
     const { getCurrentOperator } = await import("./get-current-operator");
 
+    expect(await getCurrentOperator()).toBeNull();
+  });
+
+  it("returns null for an unrecognized role value", async () => {
+    getUser.mockResolvedValueOnce({
+      data: { user: { id: "u1", email: "a@ylia.io", app_metadata: { role: "admin" } } },
+    });
+    const { getCurrentOperator } = await import("./get-current-operator");
+
+    expect(await getCurrentOperator()).toBeNull();
+  });
+
+  it("reads the staff role from app_metadata", async () => {
+    getUser.mockResolvedValueOnce({
+      data: { user: { id: "u3", email: "staff@ylia.io", app_metadata: { role: "staff" } } },
+    });
+    const { getCurrentOperator } = await import("./get-current-operator");
+
     expect(await getCurrentOperator()).toEqual({
-      id: "u1",
-      email: "a@ylia.io",
+      id: "u3",
+      email: "staff@ylia.io",
       role: "staff",
     });
   });
