@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getAssessmentById } from "@/lib/assessments/get-assessment";
 import { RadarChart } from "@/components/diagnose/RadarChart";
 import { TrackResultView } from "@/components/diagnose/TrackResultView";
+import { ConsultingCtaLink } from "@/components/diagnose/ConsultingCtaLink";
 import { ARCHITECTURE_LEVEL_COPY } from "@/lib/content/architecture-level-copy";
 import { BOTTLENECK_COPY } from "@/lib/content/bottleneck-copy";
 import { STRENGTH_COPY } from "@/lib/content/strength-copy";
@@ -115,9 +116,7 @@ export default async function ResultPage({
       </section>
 
       <section className="flex flex-col gap-3">
-        <button className="rounded-full bg-slate-900 py-4 text-sm font-semibold text-white">
-          내 사업 구조 상담하기
-        </button>
+        <ConsultingCtaLink assessmentId={assessmentId} />
         <button className="rounded-full border border-slate-200 py-4 text-sm font-semibold text-slate-700">
           결과 PDF 받기
         </button>
