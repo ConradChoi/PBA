@@ -8,7 +8,9 @@ export function LogoutButton() {
 
   async function handleLogout() {
     const supabase = createAuthBrowserClient();
-    await supabase.auth.signOut();
+    // "local" ends only this browser's session; the default ("global")
+    // would also sign the operator out on every other device.
+    await supabase.auth.signOut({ scope: "local" });
     router.push("/admin/login");
     router.refresh();
   }
