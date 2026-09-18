@@ -13,8 +13,9 @@ mix code, data, or branding between the two.
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY` (server-only — never commit this or expose
      it to the client)
-3. The database schema (`assessments`, `consulting_requests`, RLS policies,
-   the `reports` storage bucket) lives in `supabase/migrations/0001_init.sql`.
+3. Apply every file in `supabase/migrations/` (0001-0006) in order, in the
+   Supabase SQL Editor. They define `assessments`, `assessment_drafts`,
+   `consulting_requests`, RLS policies, and the `reports` storage bucket.
 4. (Optional) Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` to your GA4 web stream's
    measurement ID (Google Analytics → Admin → Data Streams → your stream).
    Without it, no GA4 script loads.
@@ -59,8 +60,36 @@ measurement ID configured, or an ad blocker).
 - `radar_layer_complete` — each layer's answers saved
 - `radar_complete` — diagnosis finished, assessment persisted
 - `radar_result_view` — result page viewed
-- `radar_pdf_request`, `radar_consulting_click`, `radar_consulting_submit` —
-  declared but not yet called; wait for Phase 2 / the consulting form.
+- `radar_consulting_click` — result page "내 사업 구조 상담하기" CTA
+- `radar_consulting_submit` — consult form submitted
+- `radar_pdf_request` — declared but not yet called; waits for Phase 2.
+
+## Admin panel
+
+`/admin` is gated by Supabase Auth (`@supabase/ssr`, session refreshed in
+`middleware.ts`). Operators are Supabase Auth users; their role lives in
+`app_metadata.role` (`owner` or `staff`, defaulting to `staff`).
+
+- `/admin/login` — email/password login
+- `/admin/consulting-requests` — requests submitted from the consult page.
+  Unread ones show a NEW badge and light up the header bell; opening a
+  request's detail page marks it read.
+- `/admin/assessments` — every completed diagnosis, with a detail page that
+  includes fields the public result page omits (email, UTM, consent).
+- `/admin/operators` — owner-only. Add or delete operators. An owner can't
+  delete their own account or the last remaining owner.
+
+The first owner account can't be created from inside the app. Create it once
+with the Supabase Admin API using the service role key:
+
+```js
+await supabase.auth.admin.createUser({
+  email: "owner@example.com",
+  password: "<temporary password>",
+  email_confirm: true,
+  app_metadata: { role: "owner" },
+});
+```
 
 ## Scope of this codebase so far
 
@@ -68,15 +97,10 @@ Implemented: project scaffold, Supabase client wiring, the scoring/level/
 bottleneck engine, the `assessments` write path, GA4 setup, and the full
 `/diagnose` flow (basic info → 7-layer question wizard, resumable via
 server-persisted drafts → result page with Radar chart, summary,
-bottleneck/strength cards, and a 90-day priority timeline).
+bottleneck/strength cards, and a 90-day priority timeline), the consulting
+request flow (`/diagnose/result/[assessmentId]/consult`), and the admin
+panel described above.
 
 **Not yet implemented** (future plans): Phase 2 (PDF generation, Resend
-email), the consulting request form (`radar_consulting_click`/
-`radar_consulting_submit`/`radar_pdf_request` events wait for it), a
-standalone privacy-policy page, and abandoned-draft cleanup (TTL/cron).
-
-**Known copy gaps** (intentional placeholders, not bugs — see
-`docs/superpowers/specs/2026-09-17-diagnose-flow-and-result-design.md`
-section D): `src/lib/content/layer-descriptions.ts` (all 7 layers) and 4
-of 7 entries in `src/lib/content/strength-copy.ts` read
-`[카피 필요: ...]`. Fill these in before a real launch.
+email, the `radar_pdf_request` event), a standalone privacy-policy page, and
+abandoned-draft cleanup (TTL/cron).
