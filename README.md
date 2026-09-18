@@ -78,6 +78,9 @@ measurement ID configured, or an ad blocker).
   includes fields the public result page omits (email, UTM, consent).
 - `/admin/operators` — owner-only. Add or delete operators. An owner can't
   delete their own account or the last remaining owner.
+- `/admin/account` — every operator can change their own password (current
+  password required). Supabase then signs the account out everywhere; the
+  browser that made the change is signed straight back in.
 
 The first owner account can't be created from inside the app. Create it once
 with the Supabase Admin API using the service role key:

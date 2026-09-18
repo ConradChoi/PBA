@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentOperator } from "@/lib/operators/get-current-operator";
 import { countUnreadConsultingRequests } from "@/lib/consulting/get-consulting-requests";
@@ -32,6 +33,12 @@ export default async function AdminDashboardLayout({
       <div className="flex flex-1 flex-col">
         <header className="flex items-center justify-end gap-2.5 border-b border-slate-200 px-10 py-3.5">
           <NotificationBell unreadCount={unreadCount} />
+          <Link
+            href="/admin/account"
+            className="rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-medium text-slate-500"
+          >
+            내 계정
+          </Link>
           <LogoutButton />
         </header>
         <main className="flex-1 px-10 py-8">{children}</main>
