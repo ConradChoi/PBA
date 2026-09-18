@@ -4,17 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { trackEvent } from "@/lib/analytics/ga4";
 import { PRIVACY_NOTICE } from "@/lib/content/privacy-notice";
+import { BUSINESS_STAGES } from "@/lib/content/business-stage";
 import type { BusinessStage } from "@/lib/types/assessment";
-
-const BUSINESS_STAGES: { value: BusinessStage; label: string }[] = [
-  { value: "idea", label: "아이디어" },
-  { value: "mvp_prep", label: "MVP 준비" },
-  { value: "building", label: "구축 중" },
-  { value: "operating", label: "운영 중" },
-  { value: "growth", label: "성장" },
-  { value: "realign", label: "재정비" },
-  { value: "other", label: "기타" },
-];
 
 export default function DiagnosePage() {
   const router = useRouter();
