@@ -24,7 +24,7 @@
 ### Task 1: `consulting_requests` migration
 
 **Files:**
-- Create: `supabase/migrations/0006_consulting_requests.sql`
+- Create: `supabase/migrations/0006_consulting_requests.sql` (alters the table created in `0001_init.sql`)
 
 **Interfaces:**
 - Produces: the `consulting_requests` table — consumed by every task below that touches consulting requests.
@@ -32,21 +32,19 @@
 - [ ] **Step 1: Create the migration**
 
 ```sql
--- Consulting requests submitted from /diagnose/result/[assessmentId]/consult.
+-- consulting_requests already exists from 0001_init.sql; align it with the
+-- admin panel design instead of recreating it.
+
+-- Match assessments.created_at so admin list/detail code sorts the same way.
+alter table consulting_requests rename column requested_at to created_at;
+
 -- read_at is null until an operator opens the request's own detail page --
 -- it backs the admin header's notification bell, not a processing status.
-create table consulting_requests (
-  id uuid primary key default gen_random_uuid(),
-  assessment_id uuid not null references assessments(id) on delete cascade,
-  preferred_contact text not null,
-  message text,
-  created_at timestamptz not null default now(),
-  read_at timestamptz
-);
+alter table consulting_requests add column read_at timestamptz;
 
-alter table consulting_requests enable row level security;
--- No policies granted to anon/authenticated: same pattern as assessment_drafts.
--- Only service_role can read/write; all access goes through server routes.
+-- Inserts now go through the server route (service_role), same pattern as
+-- assessment_drafts, so the browser no longer needs direct insert access.
+drop policy if exists "anon can insert consulting_requests" on consulting_requests;
 ```
 
 - [ ] **Step 2: Tell the user to apply it**
