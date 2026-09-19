@@ -4,6 +4,12 @@ import { useState } from "react";
 import type { OperatorListItem } from "@/lib/operators/list-operators";
 import type { OperatorRole } from "@/lib/operators/operator-role";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { ChipGroup } from "@/components/ui/ChipGroup";
+
+const ROLE_OPTIONS: { value: OperatorRole; label: string }[] = [
+  { value: "staff", label: "staff" },
+  { value: "owner", label: "owner" },
+];
 
 export function OperatorsTable({
   initialOperators,
@@ -93,17 +99,17 @@ export function OperatorsTable({
               className="w-52 rounded-lg border border-slate-200 px-3 py-2 text-sm"
             />
           </label>
-          <label className="flex flex-col gap-1.5 text-xs font-medium text-slate-600">
+          <div className="flex flex-col gap-1.5 text-xs font-medium text-slate-600">
             역할
-            <select
+            <ChipGroup
+              name="operatorRole"
+              label="역할"
+              options={ROLE_OPTIONS}
               value={role}
-              onChange={(e) => setRole(e.target.value as OperatorRole)}
-              className="w-36 rounded-lg border border-slate-200 px-3 py-2 text-sm"
-            >
-              <option value="staff">staff</option>
-              <option value="owner">owner</option>
-            </select>
-          </label>
+              onChange={setRole}
+              size="sm"
+            />
+          </div>
           <button
             type="submit"
             disabled={!email || !password || submitting}

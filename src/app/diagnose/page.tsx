@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { trackEvent } from "@/lib/analytics/ga4";
 import { PrivacyConsentField } from "@/components/diagnose/PrivacyConsentField";
 import { BUSINESS_STAGES } from "@/lib/content/business-stage";
+import { ChipGroup } from "@/components/ui/ChipGroup";
 import type { BusinessStage } from "@/lib/types/assessment";
 
 export default function DiagnosePage() {
@@ -80,21 +81,16 @@ export default function DiagnosePage() {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        <label className="flex flex-col gap-1.5 text-sm">
+        <div className="flex flex-col gap-2 text-sm">
           <span className="font-medium text-slate-700">사업 단계 *</span>
-          <select
+          <ChipGroup
+            name="businessStage"
+            label="사업 단계"
+            options={BUSINESS_STAGES}
             value={businessStage}
-            onChange={(e) => setBusinessStage(e.target.value as BusinessStage)}
-            className="rounded-lg border border-slate-200 px-3.5 py-2.5"
-          >
-            <option value="">선택해주세요</option>
-            {BUSINESS_STAGES.map((s) => (
-              <option key={s.value} value={s.value}>
-                {s.label}
-              </option>
-            ))}
-          </select>
-        </label>
+            onChange={setBusinessStage}
+          />
+        </div>
 
         {businessStage === "other" && (
           <label className="flex flex-col gap-1.5 text-sm">
