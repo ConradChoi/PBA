@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { PublicOnly } from "@/components/site/PublicOnly";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,11 +19,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body>
+      <body className="flex min-h-screen flex-col">
         {gaMeasurementId ? (
           <GoogleAnalytics measurementId={gaMeasurementId} />
         ) : null}
-        {children}
+        <PublicOnly>
+          <SiteHeader />
+        </PublicOnly>
+        <div className="flex flex-1 flex-col">{children}</div>
+        <PublicOnly>
+          <SiteFooter />
+        </PublicOnly>
       </body>
     </html>
   );

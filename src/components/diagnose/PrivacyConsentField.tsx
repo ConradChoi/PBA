@@ -46,6 +46,14 @@ export function PrivacyConsentField({
             <p className="font-semibold text-slate-700">4. 동의 거부 시 안내</p>
             <p>{PRIVACY_NOTICE.refusalNotice}</p>
           </div>
+          <a
+            href="/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-fit font-semibold text-indigo-600 underline"
+          >
+            개인정보처리방침 전문 보기
+          </a>
         </div>
       )}
     </div>

@@ -2,7 +2,7 @@ import { TrackPageView } from "@/components/TrackPageView";
 
 export default function HomePage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center gap-6 px-4 text-center">
+    <main className="mx-auto flex w-full flex-1 max-w-3xl flex-col items-center justify-center gap-6 px-4 text-center">
       <TrackPageView event="radar_landing_view" />
       <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
         PBA 7-Layer Business Radar
