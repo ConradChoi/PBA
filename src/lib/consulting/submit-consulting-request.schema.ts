@@ -1,7 +1,7 @@
 import { z } from "zod";
 
+// No contact field: requests are answered at the diagnosis email.
 export const submitConsultingRequestSchema = z.object({
-  preferredContact: z.string().min(1),
   message: z.string().optional(),
 });
 

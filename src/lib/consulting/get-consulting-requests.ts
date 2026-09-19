@@ -3,7 +3,6 @@ import { createServiceRoleSupabaseClient } from "../supabase/server";
 export type ConsultingRequestRow = {
   id: string;
   assessment_id: string;
-  preferred_contact: string;
   message: string | null;
   created_at: string;
   read_at: string | null;

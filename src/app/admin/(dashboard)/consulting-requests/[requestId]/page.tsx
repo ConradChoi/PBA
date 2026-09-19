@@ -39,8 +39,8 @@ export default async function ConsultingRequestDetailPage({
 
       <div className="flex flex-col gap-4 rounded-xl border border-slate-200 p-6">
         <div>
-          <p className="text-xs font-semibold text-slate-500">선호 연락처</p>
-          <p className="mt-1 text-sm text-slate-900">{request.preferred_contact}</p>
+          <p className="text-xs font-semibold text-slate-500">연락할 이메일</p>
+          <p className="mt-1 text-sm text-slate-900">{assessment?.email ?? "-"}</p>
         </div>
         <div>
           <p className="text-xs font-semibold text-slate-500">전달하고 싶은 말</p>

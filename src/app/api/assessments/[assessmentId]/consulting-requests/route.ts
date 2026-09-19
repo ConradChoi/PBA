@@ -22,6 +22,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     .maybeSingle();
 
   if (fetchError) {
+    console.error("consulting request: assessment lookup failed", fetchError);
     return NextResponse.json({ error: fetchError.message }, { status: 500 });
   }
   if (!assessment) {
@@ -32,13 +33,13 @@ export async function POST(request: Request, { params }: RouteParams) {
     .from("consulting_requests")
     .insert({
       assessment_id: assessmentId,
-      preferred_contact: parsed.data.preferredContact,
       message: parsed.data.message ?? null,
     })
     .select("id")
     .single();
 
   if (error) {
+    console.error("consulting request: insert failed", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 

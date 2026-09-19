@@ -13,7 +13,7 @@ mix code, data, or branding between the two.
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY` (server-only — never commit this or expose
      it to the client)
-3. Apply every file in `supabase/migrations/` (0001-0006) in order, in the
+3. Apply every file in `supabase/migrations/` (0001-0007) in order, in the
    Supabase SQL Editor. They define `assessments`, `assessment_drafts`,
    `consulting_requests`, RLS policies, and the `reports` storage bucket.
 4. (Optional) Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` to your GA4 web stream's

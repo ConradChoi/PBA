@@ -21,7 +21,7 @@ export default async function ConsultingRequestsPage() {
             <tr>
               <th className="px-4 py-3.5">신청일</th>
               <th className="px-4 py-3.5">이름</th>
-              <th className="px-4 py-3.5">선호 연락처</th>
+              <th className="px-4 py-3.5">이메일</th>
               <th className="px-4 py-3.5">메시지</th>
               <th className="px-4 py-3.5">진단 등급</th>
               <th className="px-4 py-3.5"></th>
@@ -41,7 +41,7 @@ export default async function ConsultingRequestsPage() {
                     )}
                   </td>
                   <td className="px-4 py-3.5">{assessment?.name ?? "-"}</td>
-                  <td className="px-4 py-3.5">{r.preferred_contact}</td>
+                  <td className="px-4 py-3.5">{assessment?.email ?? "-"}</td>
                   <td className="max-w-xs truncate px-4 py-3.5">{r.message ?? "-"}</td>
                   <td className="px-4 py-3.5 font-semibold text-indigo-600">
                     {assessment?.architecture_level ?? "-"}

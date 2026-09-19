@@ -15,7 +15,6 @@ beforeEach(() => {
 const row = {
   id: "r1",
   assessment_id: "a1",
-  preferred_contact: "010",
   message: null,
   created_at: "2026-09-18T00:00:00Z",
   read_at: null,

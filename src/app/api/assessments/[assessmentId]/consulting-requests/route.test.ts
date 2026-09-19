@@ -32,7 +32,7 @@ beforeEach(() => {
 });
 
 function validPayload() {
-  return { preferredContact: "010-1234-5678", message: "다음 주 통화 가능한가요?" };
+  return { message: "다음 주 통화 가능한가요?" };
 }
 
 describe("POST /api/assessments/[assessmentId]/consulting-requests", () => {
@@ -51,7 +51,7 @@ describe("POST /api/assessments/[assessmentId]/consulting-requests", () => {
     expect(response.status).toBe(201);
     expect(json.requestId).toBe("request-1");
     expect(insert).toHaveBeenCalledWith(
-      expect.objectContaining({ assessment_id: "assessment-1", preferred_contact: "010-1234-5678" })
+      { assessment_id: "assessment-1", message: "다음 주 통화 가능한가요?" }
     );
     expect(update).toHaveBeenCalledWith({ consulting_requested: true });
     expect(updateEq).toHaveBeenCalledWith("id", "assessment-1");
@@ -71,12 +71,27 @@ describe("POST /api/assessments/[assessmentId]/consulting-requests", () => {
     expect(insert).not.toHaveBeenCalled();
   });
 
-  it("returns 400 for a payload missing preferredContact", async () => {
+  it("accepts a request with no message", async () => {
+    assessmentMaybeSingle.mockResolvedValueOnce({ data: { id: "assessment-1" }, error: null });
+    insertSingle.mockResolvedValueOnce({ data: { id: "request-2" }, error: null });
     const { POST } = await import("./route");
 
     const request = new Request("http://localhost", {
       method: "POST",
-      body: JSON.stringify({ message: "no contact given" }),
+      body: JSON.stringify({}),
+    });
+    const response = await POST(request, { params: Promise.resolve({ assessmentId: "assessment-1" }) });
+
+    expect(response.status).toBe(201);
+    expect(insert).toHaveBeenCalledWith({ assessment_id: "assessment-1", message: null });
+  });
+
+  it("returns 400 when message isn't a string", async () => {
+    const { POST } = await import("./route");
+
+    const request = new Request("http://localhost", {
+      method: "POST",
+      body: JSON.stringify({ message: 123 }),
     });
     const response = await POST(request, { params: Promise.resolve({ assessmentId: "assessment-1" }) });
 
