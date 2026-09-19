@@ -45,7 +45,7 @@ export function ResultReport({ assessment }: { assessment: AssessmentRow }) {
         </p>
       </header>
 
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-3 break-inside-avoid">
         <h1 className="text-2xl font-bold">
           Architecture Score {assessment.total_raw} / 140
         </h1>
@@ -54,16 +54,16 @@ export function ResultReport({ assessment }: { assessment: AssessmentRow }) {
         </span>
       </section>
 
-      <section className="mx-auto w-full max-w-sm">
+      <section className="mx-auto w-full max-w-sm break-inside-avoid">
         <RadarChart layerScores={layerScores} />
       </section>
 
       <p className="text-sm leading-relaxed text-slate-600">{summary}</p>
 
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-3 break-inside-avoid">
         <h2 className="text-lg font-bold">Business Bottleneck Top 3</h2>
         {bottlenecks.map((layerId, i) => (
-          <div key={layerId} className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <div key={layerId} className="rounded-lg border border-slate-200 bg-slate-50 p-4 break-inside-avoid">
             <p className="text-sm font-semibold">
               {i + 1}. {layerId.toUpperCase()}
             </p>
@@ -72,10 +72,10 @@ export function ResultReport({ assessment }: { assessment: AssessmentRow }) {
         ))}
       </section>
 
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-3 break-inside-avoid">
         <h2 className="text-lg font-bold">Strength Top 2</h2>
         {strengths.map((layerId, i) => (
-          <div key={layerId} className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <div key={layerId} className="rounded-lg border border-slate-200 bg-slate-50 p-4 break-inside-avoid">
             <p className="text-sm font-semibold">
               {i + 1}. {layerId.toUpperCase()}
             </p>
@@ -84,7 +84,7 @@ export function ResultReport({ assessment }: { assessment: AssessmentRow }) {
         ))}
       </section>
 
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-3 break-inside-avoid">
         <h2 className="text-lg font-bold">90-Day Architecture Priority</h2>
         {phases.map(([period, layerId]) => (
           <div key={period} className="flex items-start gap-3">

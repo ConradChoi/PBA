@@ -3,7 +3,7 @@ import { COMPANY } from "@/lib/content/company";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-slate-200 bg-slate-50">
+    <footer className="border-t border-slate-200 bg-slate-50 print:hidden">
       <div className="mx-auto flex max-w-3xl flex-col gap-2 px-4 py-8 text-xs text-slate-500">
         <Link href="/privacy" className="w-fit font-bold text-slate-900">
           개인정보처리방침

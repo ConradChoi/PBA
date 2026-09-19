@@ -65,7 +65,8 @@ measurement ID configured, or an ad blocker).
 - `radar_result_view` — result page viewed
 - `radar_consulting_click` — result page "내 사업 구조 상담하기" CTA
 - `radar_consulting_submit` — consult form submitted
-- `radar_pdf_request` — declared but not yet called; waits for Phase 2.
+- `radar_pdf_request` — "결과 PDF 저장 · 인쇄" on the result page (opens the
+  print dialog; print styles give a clean A4 PDF via "Save as PDF")
 
 ## Admin panel
 
@@ -109,5 +110,5 @@ bottleneck/strength cards, and a 90-day priority timeline), the consulting
 request flow (`/diagnose/result/[assessmentId]/consult`), and the admin
 panel described above.
 
-**Not yet implemented** (future plans): Phase 2 (PDF generation, Resend
-email, the `radar_pdf_request` event) and multi-language support.
+**Not yet implemented** (future plans): Phase 2 (server-side PDF and Resend
+email delivery) and multi-language support.
