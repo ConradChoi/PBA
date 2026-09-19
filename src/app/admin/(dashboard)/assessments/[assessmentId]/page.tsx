@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAssessmentById } from "@/lib/assessments/get-assessment";
 import { formatBusinessStage } from "@/lib/content/business-stage";
+import { ResultReport } from "@/components/diagnose/ResultReport";
+import { ResultPreviewButton } from "@/components/admin/ResultPreviewButton";
 
 export default async function AssessmentDetailPage({
   params,
@@ -63,12 +65,9 @@ export default async function AssessmentDetailPage({
         ))}
       </div>
 
-      <Link
-        href={`/diagnose/result/${assessment.id}`}
-        className="w-fit text-sm font-semibold text-indigo-600"
-      >
-        공개 결과 화면 보기 →
-      </Link>
+      <ResultPreviewButton>
+        <ResultReport assessment={assessment} />
+      </ResultPreviewButton>
     </div>
   );
 }

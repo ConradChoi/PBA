@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { OperatorListItem } from "@/lib/operators/list-operators";
 import type { OperatorRole } from "@/lib/operators/operator-role";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 export function OperatorsTable({
   initialOperators,
@@ -17,6 +18,8 @@ export function OperatorsTable({
   const [role, setRole] = useState<OperatorRole>("staff");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<OperatorListItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -48,8 +51,11 @@ export function OperatorsTable({
 
   async function handleDelete(id: string) {
     setError(null);
+    setDeleting(true);
     const response = await fetch(`/api/admin/operators/${id}`, { method: "DELETE" });
     const json = await response.json();
+    setDeleting(false);
+    setPendingDelete(null);
 
     if (!response.ok) {
       setError(typeof json.error === "string" ? json.error : "운영자를 삭제하지 못했습니다.");
@@ -137,7 +143,7 @@ export function OperatorsTable({
                   {o.id !== currentOperatorId && (
                     <button
                       type="button"
-                      onClick={() => handleDelete(o.id)}
+                      onClick={() => setPendingDelete(o)}
                       className="font-semibold text-red-600"
                     >
                       삭제
@@ -149,6 +155,21 @@ export function OperatorsTable({
           </tbody>
         </table>
       </div>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="운영자 삭제"
+        message={
+          <>
+            <span className="font-semibold text-slate-900">{pendingDelete?.email}</span> 계정을
+            삭제할까요? 삭제하면 이 계정으로 더 이상 로그인할 수 없습니다.
+          </>
+        }
+        confirmLabel="삭제"
+        busy={deleting}
+        onConfirm={() => pendingDelete && handleDelete(pendingDelete.id)}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }
