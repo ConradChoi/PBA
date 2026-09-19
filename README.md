@@ -13,9 +13,12 @@ mix code, data, or branding between the two.
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY` (server-only — never commit this or expose
      it to the client)
-3. Apply every file in `supabase/migrations/` (0001-0008) in order, in the
+3. Apply every file in `supabase/migrations/` (0001-0009) in order, in the
    Supabase SQL Editor. They define `assessments`, `assessment_drafts`,
-   `consulting_requests`, RLS policies, and the `reports` storage bucket.
+   `consulting_requests`, RLS policies, the `reports` storage bucket, and a
+   daily pg_cron job (03:00 KST) that enforces the privacy policy's retention
+   periods: personal fields on diagnoses and consulting requests are removed
+   after 1 year, unfinished drafts after 30 days.
 4. (Optional) Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` to your GA4 web stream's
    measurement ID (Google Analytics → Admin → Data Streams → your stream).
    Without it, no GA4 script loads.
@@ -107,5 +110,4 @@ request flow (`/diagnose/result/[assessmentId]/consult`), and the admin
 panel described above.
 
 **Not yet implemented** (future plans): Phase 2 (PDF generation, Resend
-email, the `radar_pdf_request` event), a standalone privacy-policy page, and
-abandoned-draft cleanup (TTL/cron).
+email, the `radar_pdf_request` event) and multi-language support.
