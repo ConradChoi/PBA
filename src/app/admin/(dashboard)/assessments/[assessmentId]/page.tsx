@@ -18,8 +18,8 @@ export default async function AssessmentDetailPage({
   }
 
   const fields: [string, string][] = [
-    ["이름", assessment.name],
-    ["이메일", assessment.email],
+    ["이름", assessment.name ?? "익명"],
+    ["이메일", assessment.email ?? "-"],
     ["회사/브랜드명", assessment.company_name ?? "-"],
     ["역할", assessment.role ?? "-"],
     ["사업 단계", formatBusinessStage(assessment.business_stage, assessment.business_stage_other)],
@@ -53,7 +53,9 @@ export default async function AssessmentDetailPage({
         <Link href="/admin/assessments" className="text-sm text-slate-500">
           ← 전체 진단 목록
         </Link>
-        <h1 className="mt-2 text-2xl font-bold">{assessment.name}님의 진단</h1>
+        <h1 className="mt-2 text-2xl font-bold">
+          {assessment.name ? `${assessment.name}님의 진단` : "익명 진단"}
+        </h1>
       </div>
 
       <div className="grid grid-cols-2 gap-4 rounded-xl border border-slate-200 p-6 text-sm">

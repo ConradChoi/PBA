@@ -18,8 +18,8 @@ export type SubmitAssessmentInput = {
 };
 
 export type AssessmentInsertRow = {
-  name: string;
-  email: string;
+  name: string | null;
+  email: string | null;
   company_name: string | null;
   role: string | null;
   business_stage: BasicInfo["businessStage"];
@@ -53,7 +53,7 @@ export type AssessmentInsertRow = {
   utm_medium: string | null;
   utm_campaign: string | null;
   privacy_consent: boolean;
-  privacy_consent_at: string;
+  privacy_consent_at: string | null;
   privacy_notice_version: string;
   marketing_consent: boolean;
 };
@@ -79,8 +79,8 @@ export function computeAssessmentResult(
   const get = (layerId: LayerId) => scoreByLayer.get(layerId)!;
 
   const row: AssessmentInsertRow = {
-    name: input.basicInfo.name,
-    email: input.basicInfo.email,
+    name: input.basicInfo.name ?? null,
+    email: input.basicInfo.email ?? null,
     company_name: input.basicInfo.companyName ?? null,
     role: input.basicInfo.role ?? null,
     business_stage: input.basicInfo.businessStage,
@@ -114,7 +114,7 @@ export function computeAssessmentResult(
     utm_medium: input.utm?.medium ?? null,
     utm_campaign: input.utm?.campaign ?? null,
     privacy_consent: input.privacyConsent,
-    privacy_consent_at: new Date().toISOString(),
+    privacy_consent_at: input.privacyConsent ? new Date().toISOString() : null,
     privacy_notice_version: PRIVACY_NOTICE_VERSION,
     marketing_consent: input.marketingConsent,
   };

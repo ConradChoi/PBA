@@ -41,7 +41,7 @@ export function ResultReport({ assessment }: { assessment: AssessmentRow }) {
           PBA 7-Layer Business Radar
         </p>
         <p className="text-sm text-slate-500">
-          {assessment.name} · {new Date(assessment.created_at).toLocaleDateString("ko-KR")}
+          {assessment.name ?? "익명 진단"} · {new Date(assessment.created_at).toLocaleDateString("ko-KR")}
         </p>
       </header>
 

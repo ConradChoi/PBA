@@ -27,10 +27,14 @@ export default async function ConsultPage({
         </p>
         <h1 className="text-2xl font-bold">상담 신청</h1>
         <p className="text-sm text-slate-500">
-          {assessment.name}님의 진단 결과를 바탕으로 상담을 도와드리겠습니다.
+          {assessment.name ? `${assessment.name}님의 진단` : "진단"} 결과를 바탕으로 상담을
+          도와드리겠습니다.
         </p>
       </div>
-      <ConsultForm assessmentId={assessmentId} maskedEmail={maskEmail(assessment.email)} />
+      <ConsultForm
+        assessmentId={assessmentId}
+        maskedEmail={assessment.email ? maskEmail(assessment.email) : null}
+      />
     </main>
   );
 }

@@ -56,11 +56,11 @@ export default async function ConsultingRequestDetailPage({
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
               <p className="text-xs text-slate-500">이름</p>
-              <p className="font-medium">{assessment.name}</p>
+              <p className="font-medium">{assessment.name ?? "익명"}</p>
             </div>
             <div>
               <p className="text-xs text-slate-500">이메일</p>
-              <p className="font-medium">{assessment.email}</p>
+              <p className="font-medium">{assessment.email ?? "-"}</p>
             </div>
             <div>
               <p className="text-xs text-slate-500">사업 단계</p>

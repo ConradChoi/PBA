@@ -30,8 +30,9 @@ export const layerIdSchema = z.enum([
 
 export const basicInfoSchema = z
   .object({
-    name: z.string().min(1),
-    email: z.string().email(),
+    // Collected only with privacy consent; see withConsentRules below.
+    name: z.string().min(1).optional(),
+    email: z.string().email().optional(),
     companyName: z.string().optional(),
     role: z.string().optional(),
     businessStage: businessStageSchema,
@@ -55,14 +56,42 @@ const utmSchema = z
   })
   .optional();
 
-export const draftBasicInfoSchema = z.object({
+const draftBasicInfoFields = z.object({
   basicInfo: basicInfoSchema,
-  privacyConsent: z.literal(true),
+  privacyConsent: z.boolean(),
   marketingConsent: z.boolean(),
   utm: utmSchema,
 });
 
-export const submitAssessmentSchema = draftBasicInfoSchema.extend({
+type ConsentFields = z.infer<typeof draftBasicInfoFields>;
+
+// Privacy consent is optional (anonymous diagnosis). With it, name and email
+// are required; without it, personal fields are dropped server-side and
+// marketing consent is forced off, since there's no address to market to.
+function withConsentRules<S extends z.ZodType<ConsentFields, z.ZodTypeDef, unknown>>(
+  schema: S
+) {
+  return schema
+    .superRefine((data, ctx) => {
+      if (!data.privacyConsent) return;
+      if (!data.basicInfo.name) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["basicInfo", "name"], message: "Required" });
+      }
+      if (!data.basicInfo.email) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["basicInfo", "email"], message: "Required" });
+      }
+    })
+    .transform((data): z.infer<S> => {
+      if (data.privacyConsent) return data as z.infer<S>;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { name, email, companyName, role, ...rest } = data.basicInfo;
+      return { ...data, basicInfo: rest, marketingConsent: false } as z.infer<S>;
+    });
+}
+
+export const draftBasicInfoSchema = withConsentRules(draftBasicInfoFields);
+
+export const submitAssessmentSchema = withConsentRules(draftBasicInfoFields.extend({
   answers: z.object({
     value: layerAnswerSetSchema,
     customer: layerAnswerSetSchema,
@@ -72,7 +101,7 @@ export const submitAssessmentSchema = draftBasicInfoSchema.extend({
     data: layerAnswerSetSchema,
     scale: layerAnswerSetSchema,
   }),
-});
+}));
 
 export const patchDraftAnswersSchema = z.object({
   layerId: layerIdSchema,

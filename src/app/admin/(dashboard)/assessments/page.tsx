@@ -30,8 +30,8 @@ export default async function AssessmentsPage() {
                 <td className="px-4 py-3.5">
                   {new Date(a.created_at).toLocaleDateString("ko-KR")}
                 </td>
-                <td className="px-4 py-3.5">{a.name}</td>
-                <td className="px-4 py-3.5">{a.email}</td>
+                <td className="px-4 py-3.5">{a.name ?? "익명"}</td>
+                <td className="px-4 py-3.5">{a.email ?? "-"}</td>
                 <td className="px-4 py-3.5">
                   {formatBusinessStage(a.business_stage, a.business_stage_other)}
                 </td>

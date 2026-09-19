@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { trackEvent } from "@/lib/analytics/ga4";
-import { PRIVACY_NOTICE } from "@/lib/content/privacy-notice";
+import { PrivacyConsentField } from "@/components/diagnose/PrivacyConsentField";
 import { BUSINESS_STAGES } from "@/lib/content/business-stage";
 import type { BusinessStage } from "@/lib/types/assessment";
 
@@ -19,16 +19,13 @@ export default function DiagnosePage() {
   const [teamSize, setTeamSize] = useState("");
   const [privacyConsent, setPrivacyConsent] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
-  const [noticeOpen, setNoticeOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const canSubmit =
-    name &&
-    email &&
     businessStage &&
     (businessStage !== "other" || businessStageOther.trim()) &&
-    privacyConsent &&
+    (!privacyConsent || (name && email)) &&
     !submitting;
 
   async function handleSubmit(e: React.FormEvent) {
@@ -43,10 +40,14 @@ export default function DiagnosePage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         basicInfo: {
-          name,
-          email,
-          companyName: companyName || undefined,
-          role: role || undefined,
+          // Personal fields are sent only with privacy consent (anonymous
+          // diagnosis otherwise); the server drops them regardless.
+          ...(privacyConsent && {
+            name,
+            email,
+            companyName: companyName || undefined,
+            role: role || undefined,
+          }),
           businessStage,
           businessStageOther:
             businessStage === "other" ? businessStageOther : undefined,
@@ -54,7 +55,7 @@ export default function DiagnosePage() {
           teamSize: teamSize || undefined,
         },
         privacyConsent,
-        marketingConsent,
+        marketingConsent: privacyConsent && marketingConsent,
       }),
     });
 
@@ -79,45 +80,6 @@ export default function DiagnosePage() {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">이름 *</span>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="홍길동"
-            className="rounded-lg border border-slate-200 px-3.5 py-2.5"
-          />
-        </label>
-
-        <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">이메일 *</span>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            className="rounded-lg border border-slate-200 px-3.5 py-2.5"
-          />
-        </label>
-
-        <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">회사/브랜드명 (선택)</span>
-          <input
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
-            className="rounded-lg border border-slate-200 px-3.5 py-2.5"
-          />
-        </label>
-
-        <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">역할 (선택)</span>
-          <input
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="rounded-lg border border-slate-200 px-3.5 py-2.5"
-          />
-        </label>
-
         <label className="flex flex-col gap-1.5 text-sm">
           <span className="font-medium text-slate-700">사업 단계 *</span>
           <select
@@ -164,53 +126,65 @@ export default function DiagnosePage() {
           />
         </label>
 
-        <div className="flex flex-col gap-2">
-          <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-            <input
-              type="checkbox"
-              checked={privacyConsent}
-              onChange={(e) => setPrivacyConsent(e.target.checked)}
-            />
-            개인정보 수집·이용에 동의합니다 *
-          </label>
-          <p className="text-xs text-slate-500">{PRIVACY_NOTICE.summary}</p>
-          <button
-            type="button"
-            onClick={() => setNoticeOpen((v) => !v)}
-            className="w-fit text-xs font-semibold text-indigo-600"
-          >
-            자세히 보기 {noticeOpen ? "▴" : "▾"}
-          </button>
-          {noticeOpen && (
-            <div className="flex flex-col gap-2.5 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
-              <div>
-                <p className="font-semibold text-slate-700">1. 개인정보 수집 목적</p>
-                <p>{PRIVACY_NOTICE.purpose}</p>
-              </div>
-              <div>
-                <p className="font-semibold text-slate-700">2. 수집항목</p>
-                <p className="whitespace-pre-line">{PRIVACY_NOTICE.itemsCollected}</p>
-              </div>
-              <div>
-                <p className="font-semibold text-slate-700">3. 보유기간</p>
-                <p>{PRIVACY_NOTICE.retentionPeriod}</p>
-              </div>
-              <div>
-                <p className="font-semibold text-slate-700">4. 동의 거부 시 안내</p>
-                <p>{PRIVACY_NOTICE.refusalNotice}</p>
-              </div>
-            </div>
-          )}
+        <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4">
+          <p className="text-xs text-slate-500">
+            동의하시면 결과 PDF와 상담 안내를 이메일로 받으실 수 있습니다. 동의하지
+            않으셔도 진단과 결과 확인은 그대로 이용하실 수 있습니다.
+          </p>
+          <PrivacyConsentField checked={privacyConsent} onChange={setPrivacyConsent} />
         </div>
 
-        <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-          <input
-            type="checkbox"
-            checked={marketingConsent}
-            onChange={(e) => setMarketingConsent(e.target.checked)}
-          />
-          마케팅 정보 수신에 동의합니다
-        </label>
+        {privacyConsent && (
+          <>
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="font-medium text-slate-700">이름 *</span>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="홍길동"
+                className="rounded-lg border border-slate-200 px-3.5 py-2.5"
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="font-medium text-slate-700">이메일 *</span>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="rounded-lg border border-slate-200 px-3.5 py-2.5"
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="font-medium text-slate-700">회사/브랜드명 (선택)</span>
+              <input
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                className="rounded-lg border border-slate-200 px-3.5 py-2.5"
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="font-medium text-slate-700">역할 (선택)</span>
+              <input
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="rounded-lg border border-slate-200 px-3.5 py-2.5"
+              />
+            </label>
+
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+              <input
+                type="checkbox"
+                checked={marketingConsent}
+                onChange={(e) => setMarketingConsent(e.target.checked)}
+              />
+              마케팅 정보 수신에 동의합니다 (선택)
+            </label>
+          </>
+        )}
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 

@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { SubmitAssessmentInput } from "./submit-assessment";
 import { computeAssessmentResult } from "./submit-assessment";
-import { submitAssessmentSchema } from "./submit-assessment.schema";
+import { draftBasicInfoSchema, submitAssessmentSchema } from "./submit-assessment.schema";
+import { PRIVACY_NOTICE_VERSION } from "../content/privacy-notice";
 
 function allOnesInput(): SubmitAssessmentInput {
   return {
@@ -66,10 +67,23 @@ describe("computeAssessmentResult", () => {
     const result = computeAssessmentResult(allOnesInput());
 
     expect(result.row.privacy_consent).toBe(true);
-    expect(result.row.privacy_notice_version).toBe("2026-09-17");
-    expect(new Date(result.row.privacy_consent_at).toString()).not.toBe(
+    expect(result.row.privacy_notice_version).toBe(PRIVACY_NOTICE_VERSION);
+    expect(new Date(result.row.privacy_consent_at!).toString()).not.toBe(
       "Invalid Date"
     );
+  });
+
+  it("stores an anonymous diagnosis without personal fields or a consent time", () => {
+    const input = allOnesInput();
+    input.privacyConsent = false;
+    input.basicInfo = { businessStage: "idea" };
+
+    const result = computeAssessmentResult(input);
+
+    expect(result.row.name).toBeNull();
+    expect(result.row.email).toBeNull();
+    expect(result.row.privacy_consent).toBe(false);
+    expect(result.row.privacy_consent_at).toBeNull();
   });
 });
 
@@ -110,5 +124,42 @@ describe("submitAssessmentSchema", () => {
 
     const parsed = submitAssessmentSchema.safeParse(valid);
     expect(parsed.success).toBe(true);
+  });
+});
+
+describe("anonymous diagnosis consent rules", () => {
+  it("requires name and email when privacy consent is given", () => {
+    const invalid = allOnesInput();
+    invalid.basicInfo = { businessStage: "idea" };
+
+    const parsed = submitAssessmentSchema.safeParse(invalid);
+    expect(parsed.success).toBe(false);
+  });
+
+  it("accepts a diagnosis without consent, name, or email", () => {
+    const anonymous = allOnesInput();
+    anonymous.privacyConsent = false;
+    anonymous.basicInfo = { businessStage: "idea", industry: "교육" };
+
+    const parsed = submitAssessmentSchema.safeParse(anonymous);
+    expect(parsed.success).toBe(true);
+  });
+
+  it("drops personal fields and marketing consent sent without privacy consent", () => {
+    const parsed = draftBasicInfoSchema.parse({
+      basicInfo: {
+        name: "보내면 안 되는 이름",
+        email: "leak@example.com",
+        companyName: "회사",
+        role: "대표",
+        businessStage: "idea",
+        industry: "교육",
+      },
+      privacyConsent: false,
+      marketingConsent: true,
+    });
+
+    expect(parsed.basicInfo).toEqual({ businessStage: "idea", industry: "교육" });
+    expect(parsed.marketingConsent).toBe(false);
   });
 });

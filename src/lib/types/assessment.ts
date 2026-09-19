@@ -44,8 +44,9 @@ export type LayerScore = {
 };
 
 export type BasicInfo = {
-  name: string;
-  email: string;
+  // Present only when privacy consent was given (anonymous otherwise).
+  name?: string;
+  email?: string;
   companyName?: string;
   role?: string;
   businessStage: BusinessStage;
