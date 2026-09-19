@@ -1,26 +1,36 @@
-# Result Enrichment (Maturity, Risk Signals, Hypothesis Teaser) + Outcome Data Design
+# Result Enrichment (Maturity, Risk Signals, Hypothesis Teaser) + Outcome Data + Retention Control Design
 
-**Status:** Approved for planning
+**Status:** Approved for planning (revised after privacy review)
 **Builds on:** the result page, `ResultReport`, anonymous diagnosis, and print-to-PDF as of commit `0293f0c`
 **Precedes:** multi-language support (`docs/superpowers/specs/2026-09-19-i18n-design.md`); its migration moves from `0010` to `0011`
 
 ## Goal
 
-First, minimal step of the PBA methodology roadmap (Assess → Maturity → Detect → Explain → Verify → Prioritize → Improve → Re-Assess → Learn → Validate). Make the free result page a more professional report without giving away what consulting sells, and start capturing the data that later steps (Re-Assess, Learn, Validate) will need.
+First, minimal step of the PBA methodology roadmap (Assess → Maturity → Detect → Explain → Verify → Prioritize → Improve → Re-Assess → Learn → Validate). Make the free result page a more professional report without giving away what consulting sells, start capturing non-identifying outcome data for later analysis, and let operators keep a contracted customer's data past the default retention.
 
 ## Decisions Made During Brainstorming
 
-1. **Direction approved, scope cut** (per the ceo-advisor review): the free result gets ② Maturity, ③ rule-based Risk Signals, and a one-hypothesis teaser of ④. ⑤–⑦ in full stay in paid consulting. ⑧ is designed now (linkage + comparison). ⑨–⑩ wait for data.
-2. **Free shows "what", consulting sells "why/how".** Only one cause hypothesis is public; the second is internal, visible in the admin only.
+1. **Direction approved, scope cut** (ceo-advisor review): the free result gets ② Maturity, ③ rule-based Risk Signals, and a one-hypothesis teaser of ④. ⑤–⑦ in full stay in paid consulting. ⑨–⑩ wait for data.
+2. **Free shows "what", consulting sells "why/how".** Only one cause hypothesis is public; the second is internal, admin-only.
 3. **No "validated method" claims** in public copy until ⑩ has data.
-4. **Korean content first; translation later.** Copy is expected to change; i18n translates only after it stabilizes.
-5. **Maturity levels follow the response scale** (layer average rounded): the level a person reaches means the same thing as the answer they gave.
-6. **Outcome bands and result fit are collected on the result page**, not at the start, to keep the start light.
-7. **Re-assessment links by assessment ID, never by email**, so linkage survives the 1-year personal-data purge (migration 0009).
-8. **Content is drafted by Claude in a review document**; implementation proceeds with the drafts, and approved wording later only replaces data files.
-9. **4-week checkpoint:** if consult conversion and result-fit averages clear the bar, expand to per-question anchors (140). Not part of this design.
+4. **Korean content first; translation later.**
+5. **Maturity levels follow the response scale** (layer average rounded).
+6. **Result fit and outcome bands are collected on the result page**, not at the start.
+7. **⑧ Re-Assessment is not in the free product.** Re-diagnosis happens under a consulting contract. No re-assess button, no assessment-to-assessment linkage, no comparison view, no reminder email. (This also removes the privacy review's critical finding about linkage chains.)
+8. **Operators control retention per assessment** (for contracted customers): keep personal data until a set date (days/months/years from today, with a required reason, editable any time), revert to the default policy, or delete personal data now. Any operator (owner or staff) can do this; every change records who and when.
+9. **"Delete now" removes personal data only** — same effect as the 1-year purge; the non-identifying diagnosis stays for statistics.
+10. **Headcount is asked once:** the basic-info "팀 규모" free-text field becomes headcount-band chips; the result-page outcome card asks only revenue and growth.
+11. **Two-phase launch** because the privacy policy promises 7 days' notice of changes (section 12):
+    - **Phase A (ship now):** maturity, risk signals, hypothesis teaser, CTA change, GA4 URL masking — no new data collected, no policy change.
+    - **Phase B (effective 2026-09-26):** result fit, outcome bands, team-size chips, retention control, consent notice and privacy policy revisions, purge changes. The revised policy is announced on 2026-09-19.
+12. **Content is drafted by Claude in a review document** (`docs/content/2026-09-19-result-content-draft.md`); implementation proceeds with the drafts.
+13. **4-week checkpoint:** if consult conversion and result-fit averages clear the bar, expand to per-question anchors (140). Not part of this design.
 
-## A. Maturity
+---
+
+# Phase A
+
+## A1. Maturity
 
 `maturityLevel(raw: number): 1 | 2 | 3 | 4 | 5` in `src/lib/scoring/maturity.ts`, from the layer raw score (4–20):
 
@@ -32,11 +42,9 @@ First, minimal step of the PBA methodology roadmap (Assess → Maturity → Dete
 | 14–17 | L4 | 운영 | 실제 운영에 적용되고 있음 |
 | 18–20 | L5 | 체계화 | 명확하게 정의되고 데이터로 관리됨 |
 
-Computed at render time from stored `score_*_raw`; nothing new is stored.
+Computed at render time from stored `score_*_raw`. **UI:** a "레이어별 성숙도" section right below the radar chart — one row per layer: layer name, `L{n} {name}`, a 5-step bar, and that layer's anchor for its level (`src/lib/content/maturity-anchors.ts`, 7 × 5 = 35 lines; level names in `maturity-levels.ts`).
 
-**UI:** a "레이어별 성숙도" section right below the radar chart: one row per layer — layer name, `L{n} {name}`, a 5-step bar, and that layer's anchor for its level (`maturity-anchors.ts`, 7 × 5 = 35 lines).
-
-## B. Risk Signals
+## A2. Risk Signals
 
 `src/lib/content/risk-signals.ts` holds rules as data:
 
@@ -45,86 +53,120 @@ type RiskSignalRule = {
   id: string;
   priority: number;            // lower = shown first
   when: { layer: LayerId; op: "<=" | ">="; level: 1 | 2 | 3 | 4 | 5 }[]; // all must hold
-  title: string;               // e.g. "구조 없는 확장"
+  title: string;
   message: string;
 };
 ```
 
-`evaluateRiskSignals(levels: Record<LayerId, Level>): RiskSignalRule[]` in `src/lib/scoring/risk-signals.ts` returns matching rules sorted by priority, **max 2**. Five rules to start (drafted in the content document). The section ("위험 신호") renders below Bottleneck Top 3 and is omitted when nothing matches.
+`evaluateRiskSignals(levels: Record<LayerId, Level>): RiskSignalRule[]` in `src/lib/scoring/risk-signals.ts` returns matching rules sorted by priority, **max 2**. Five rules to start. The "위험 신호" section renders below Bottleneck Top 3 and is omitted when nothing matches.
 
-## C. Cause Hypothesis Teaser
+## A3. Cause Hypothesis Teaser
 
 `src/lib/content/cause-hypotheses.ts`: `Record<LayerId, { public: string; internal: string }>`.
 
-- Result page: for the lowest layer (bottleneck #1) only, a "가능성 높은 원인 가설" card with the `public` hypothesis and the line "위 가설이 실제 원인인지, 상담에서 프로세스와 데이터를 함께 확인해 드립니다."
-- Admin result popup: shows both `public` and `internal` for all three bottleneck layers.
-- `ResultReport` gets an `audience: "public" | "admin"` prop to control this.
+- Result page: for bottleneck #1 only, a "가능성 높은 원인 가설" card with the `public` hypothesis and "위 가설이 실제 원인인지, 상담에서 프로세스와 데이터를 함께 확인해 드립니다."
+- Admin result popup: `public` and `internal` for all three bottleneck layers.
+- `ResultReport` gets an `audience: "public" | "admin"` prop.
 
 **CTA:** "내 사업 구조 상담하기" → "원인 가설 검증 상담받기" (same destination and GA4 event).
 
-## D. Result Fit and Outcome Bands
+Print includes maturity, risk signals, and the hypothesis card.
+
+## A4. GA4 URL Masking
+
+The result URL's assessment UUID is the only credential to view a result, and GA4 currently sends it to Google (US) in `page_location`/`page_path`. Configure gtag with a masked location for result and consult pages: `/diagnose/result/[id]` → `/diagnose/result/:id`, `/diagnose/result/[id]/consult` → `/diagnose/result/:id/consult`, draft pages `/diagnose/[draftId]` → `/diagnose/:draftId`. New GA4 events never carry band values or IDs.
+
+---
+
+# Phase B (effective 2026-09-26)
+
+## B1. Result Fit and Outcome Bands
 
 Rendered on the result page above the consult CTA; hidden in print and in the admin popup.
 
-**Result fit:** "이 진단 결과가 실제 상황과 맞나요?" as 1–5 `ChipGroup`. Selecting saves immediately (`PATCH /api/assessments/[id]/feedback` with `{ resultFit }`), shows "의견 감사합니다", and can be changed.
+**Result fit:** "이 진단 결과가 실제 상황과 맞나요?" as a 1–5 `ChipGroup`. Selecting saves immediately (`PATCH /api/assessments/[id]/feedback`, `{ resultFit }`), shows a thank-you line, and can be changed.
 
-**Outcome bands (optional):** a collapsed card "더 정확한 분석을 위해 알려주세요" with three `ChipGroup`s and a submit button (`PATCH /api/assessments/[id]/outcome`; all three optional, at least one required):
+**Outcome bands (optional):** a collapsed card with a short notice — purpose (진단 정확도 향상·통계), that it's optional with no disadvantage if skipped, and that for consented diagnoses it's kept with name/email and the identifying part is deleted after 1 year — two `ChipGroup`s, and a submit button labeled "안내를 확인했으며 제출합니다". `PATCH /api/assessments/[id]/outcome`, at least one field. **Write-once:** rejected (409) if `outcome_at` is already set.
 
 | Field | Codes (label) |
 |---|---|
 | `revenue_band` | `pre_revenue` 매출 전, `lt_100m` 1억 미만, `100m_1b` 1~10억, `1b_5b` 10~50억, `5b_10b` 50~100억, `gte_10b` 100억 이상 |
-| `headcount_band` | `solo` 1명, `2_5`, `6_20`, `21_50`, `51_200`, `gt_200` 200명 이상 |
 | `growth_band` | `decline` 감소, `flat` 정체(±10%), `10_50` 10~50% 성장, `50_100` 50~100% 성장, `gte_100` 2배 이상, `lt_1y` 1년 미만 사업 |
 
-Both routes: Zod-validated (400), unknown assessment (404), service_role write, knowing the result URL is the only credential (same as viewing the result). Submitting sets `result_fit_at` / `outcome_at`.
+Both routes: Zod-validated (400), unknown assessment (404), service_role write.
 
-## E. Re-Assessment
+## B2. Team Size → Headcount Band
 
-- Result page: a "90일 후 다시 진단하기" card showing the recommended date (`created_at + 90 days`), a tip to bookmark the result page, and a button to `/diagnose?prev=<assessmentId>`.
-- `/diagnose` passes `prev` through to `POST /api/assessment-drafts` as `previousAssessmentId`; the server ignores it unless it's an existing assessment ID. It's stored on the draft and copied to the assessment on completion.
-- A result whose `previous_assessment_id` resolves shows a "이전 진단과 비교" section: radar with the previous run as a grey series, total score change, and per-layer level change (e.g. `CUSTOMER L2 → L3 ▲`). `compareAssessments(prev, curr)` in `src/lib/scoring/compare.ts`.
-- 90-day reminder email: Phase 2, consented users only. Not built here.
+The basic-info "팀 규모 (선택)" free-text input becomes a `ChipGroup` storing a code in the existing `team_size` column: `solo` 1명, `2_5` 2~5명, `6_20` 6~20명, `21_50` 21~50명, `51_200` 51~200명, `gt_200` 200명 이상. Existing free-text values stay as they are; admin shows a code's label, or the raw text for legacy rows.
 
-## F. Data (migration `0010_result_enrichment.sql`)
+## B3. Retention Control (admin)
 
-`assessments`:
-- `result_fit smallint check (result_fit between 1 and 5)`, `result_fit_at timestamptz`
-- `revenue_band text`, `headcount_band text`, `growth_band text` (each with a `check` on its code list), `outcome_at timestamptz`
-- `previous_assessment_id uuid references assessments(id) on delete set null`
+**Data:** `assessments.retain_until timestamptz`, `retention_reason text`, `retention_updated_by text` (operator email), `retention_updated_at timestamptz`.
 
-`assessment_drafts`: `previous_assessment_id uuid references assessments(id) on delete set null`.
+**Admin assessment detail — "정보 보관" card:**
+- Default: "기본 정책 · {수집일 + 1년} 개인정보 파기 예정" (or "개인정보 없음" for anonymous/already purged rows, where only "보관 기간 설정" is hidden).
+- Extended: "연장 보관 · {retain_until}까지 유지", reason, who/when.
+- Actions (any operator):
+  - **보관 기간 설정 / 수정:** centered modal — a number input, unit chips (일·개월·년), required reason; `retain_until = today + n units`. Editable any time.
+  - **기본 정책으로 되돌리기:** clears the four columns.
+  - **개인정보 지금 삭제:** centered confirm dialog → nulls name, email, company, role, marketing consent, industry, utm fields and deletes the assessment's consulting requests (same as the purge), and clears retention columns.
+- API: `PUT /api/admin/assessments/[id]/retention` (`{ amount, unit, reason }` or `{ reset: true }`) and `POST /api/admin/assessments/[id]/purge`, both requiring `getCurrentOperator()`.
 
-The i18n design's locale migration becomes `0011_add_locale.sql`.
+**Purge (migration update):** skip assessments with `retain_until > now()`, and skip consulting requests whose assessment is retained. When `retain_until` passes, the next run purges normally (if the 1-year point has also passed).
 
-## G. Privacy
+## B4. Purge Changes (privacy review)
 
-- Result fit and outcome bands are **non-identifying diagnosis information**: collected regardless of consent, and untouched by the 1-year purge (kept for statistics). Re-assessment linkage uses assessment IDs only.
-- `/privacy` updates: add these fields to the "진단 정보" row; add "진단 방법론 연구·개선" to the purposes. The consent notice (personal items) is unchanged, so `PRIVACY_NOTICE_VERSION` stays.
-- The privacy-security-officer agent reviews this section before implementation.
+The daily purge also nulls `industry` (free text, re-identifying in small industries) and `utm_source`/`utm_medium`/`utm_campaign`. Revenue/growth bands and team-size codes stay (coarse bands). The manual "delete now" uses the same function logic.
 
-## H. Admin
+## B5. Consent Notice and Privacy Policy
 
-Assessment detail adds: result fit, the three bands (labels), and a link to the previous assessment when present. The result popup uses `audience="admin"` (both hypotheses).
+**Consent notice** (`privacy-notice.ts`): add "선택항목(결과 화면에서 입력 시): 매출·성장 구간" and the purpose "진단 정확도 향상"; bump `PRIVACY_NOTICE_VERSION` to `2026-09-26`.
 
-## I. GA4
+**Privacy policy** (new version effective 2026-09-26; the 2026-09-19 version stays viewable at `/privacy/2026-09-19`):
+- §1 purposes: add "진단 방법론 연구·개선(개인을 식별할 수 없는 형태로 가공한 정보에 한함)".
+- §2 "진단 정보" row: "사업 단계, 업종, 팀 규모, 문항 응답과 진단 결과, 결과 적합도 평가, 연 매출·최근 12개월 성장 구간(선택 입력)", note: "익명 진단 시에는 이 정보만으로 개인을 식별할 수 없습니다. 개인정보 수집에 동의하거나 상담을 신청한 경우에는 이름·이메일과 함께 개인정보로 처리됩니다."
+- §3 retention: add "상담·컨설팅 계약을 맺은 경우, 계약 이행과 재진단을 위해 계약에서 정한 기간 동안 보관할 수 있습니다." and "개인정보를 파기할 때 업종 등 자유 입력 정보와 유입 경로 정보도 함께 삭제하여, 남는 진단 정보로는 개인을 알아볼 수 없도록 합니다."
+- §12: note the revision date and link to the previous version.
 
-New events in `src/lib/analytics/events.ts`: `radar_result_feedback` (fit chosen), `radar_outcome_submit` (bands submitted), `radar_reassess_start` (the re-assess button).
+**Announcement (2026-09-19):** a footer line "개인정보처리방침 개정 안내 (2026-09-26 시행)" linking to the new version with a change summary. Until 2026-09-26, `/privacy` shows the current version; from then on, the new one.
 
-## J. Content Drafting
+**Research queries** use a view excluding name, email, company, and role (`assessments_research`), created in this migration.
 
-Claude drafts all new copy in `docs/content/2026-09-19-result-content-draft.md`: level names, 35 anchors, 5 risk rules, 14 hypotheses (7 public + 7 internal), and the new UI strings — grounded in each layer's four questions and existing bottleneck/strength copy. The CEO edits the document; approved wording replaces the data files. Implementation does not wait for approval.
+## B6. Data (migration `0010_result_enrichment.sql`)
 
-## K. Testing
+- `assessments`: `result_fit smallint check 1–5`, `result_fit_at`, `revenue_band` and `growth_band` (checked code lists), `outcome_at`, `retain_until`, `retention_reason`, `retention_updated_by`, `retention_updated_at`.
+- `assessments_research` view.
+- `purge_expired_personal_data()` replaced per B3/B4.
 
-- **Unit:** `maturityLevel` boundaries (4, 5/6, 9/10, 13/14, 17/18, 20, and out-of-range throws); `evaluateRiskSignals` for no match, one match, three or more matches → first two by priority; `compareAssessments`.
-- **Content completeness:** every layer has 5 anchors and both hypotheses; every risk rule references valid layers and levels.
-- **API:** feedback and outcome routes — valid (200), invalid values (400), unknown assessment (404); drafts route accepts a valid `previousAssessmentId`, drops an unknown one; completion copies it.
-- **Manual (dev server):** diagnose → maturity, risk signals, and hypothesis render → submit fit and bands → re-assess from the card → comparison renders → admin detail/popup show the new fields and internal hypotheses → print includes maturity, risk signals, and the hypothesis card but not the fit/outcome/re-assess UI.
+The i18n locale migration becomes `0011_add_locale.sql`.
+
+## B7. Launch Gating
+
+Phase B UI (fit, outcome card, team-size chips) and the retention controls ship behind a date gate `PHASE_B_START = 2026-09-26T00:00:00+09:00` checked server-side, so the code can merge and deploy before the effective date. The migration can be applied at any time (new columns are unused until then).
+
+## B8. Admin
+
+Assessment detail adds result fit, the revenue/growth band labels, the team-size label, and the "정보 보관" card.
+
+## B9. GA4
+
+New events: `radar_result_feedback` (fit chosen), `radar_outcome_submit` (bands submitted). No values attached.
+
+---
+
+## Testing
+
+- **Unit:** `maturityLevel` boundaries (4, 5/6, 9/10, 13/14, 17/18, 20, out-of-range throws); `evaluateRiskSignals` (none, one, three+ → first two by priority); retention date math (days/months/years, month-end).
+- **Content completeness:** every layer has 5 anchors and both hypotheses; every rule references valid layers/levels.
+- **API:** feedback/outcome — valid, invalid (400), unknown (404), outcome second write (409), gated before Phase B start; retention/purge routes — unauthenticated (401/403), valid set/reset/delete, required reason.
+- **Purge (against Supabase):** retained rows and their consulting requests survive; expired retention purges; industry/utm are nulled.
+- **Manual:** Phase A on the dev server (maturity, risks, hypothesis, CTA, print, GA4 masked path); Phase B with the gate overridden (fit, outcome once, team-size chips, admin retention set/edit/reset/delete-now, policy/notice versions).
 
 ## Explicitly Out of Scope
 
+- Re-assessment in the free product (button, linkage, comparison, reminders).
 - Per-question anchors (140), decided at the 4-week checkpoint.
 - Standardized industry codes.
-- 90-day reminder email.
-- Consulting-side tooling for ⑤ Verify, ⑥ Prioritize scoring, ⑦ DMAIC; ⑨ pattern mining; ⑩ statistical validation.
+- Consulting-side tooling for ⑤–⑦; ⑨ pattern mining; ⑩ statistical validation.
+- Rate limiting beyond write-once outcome (revisit if abuse appears).
 - Translating any of the new copy.
