@@ -6,7 +6,7 @@ import { buildSummaryParagraph } from "@/lib/content/summary";
 import type { AssessmentRow } from "@/lib/assessments/get-assessment";
 import type { LayerId, LayerScore } from "@/lib/types/assessment";
 import { LAYER_IDS } from "@/lib/types/assessment";
-import { maturityLevel } from "@/lib/scoring/maturity";
+import { maturityLevel, type MaturityLevel } from "@/lib/scoring/maturity";
 import { evaluateRiskSignals } from "@/lib/scoring/risk-signals";
 import { MATURITY_LEVELS } from "@/lib/content/maturity-levels";
 import { MATURITY_ANCHORS } from "@/lib/content/maturity-anchors";
@@ -48,8 +48,14 @@ export function ResultReport({
   ];
 
   const levelByLayer = Object.fromEntries(
-    layerScores.map((score) => [score.layerId, maturityLevel(score.raw)])
-  ) as Record<LayerId, ReturnType<typeof maturityLevel>>;
+    layerScores.map((score) => [
+      score.layerId,
+      // Stored scores are 4-20 by construction, but nothing in the database
+      // enforces it; clamp so one bad row degrades this section instead of
+      // failing the whole page render.
+      maturityLevel(Math.min(20, Math.max(4, score.raw))),
+    ])
+  ) as Record<LayerId, MaturityLevel>;
   const riskSignals = evaluateRiskSignals(levelByLayer);
   const layerNameById = new Map(LAYERS.map((layer) => [layer.id, layer.name]));
 
