@@ -68,7 +68,7 @@ export default async function AssessmentDetailPage({
       </div>
 
       <ResultPreviewButton>
-        <ResultReport assessment={assessment} />
+        <ResultReport assessment={assessment} audience="admin" />
       </ResultPreviewButton>
     </div>
   );

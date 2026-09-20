@@ -6,6 +6,12 @@ import { buildSummaryParagraph } from "@/lib/content/summary";
 import type { AssessmentRow } from "@/lib/assessments/get-assessment";
 import type { LayerId, LayerScore } from "@/lib/types/assessment";
 import { LAYER_IDS } from "@/lib/types/assessment";
+import { maturityLevel } from "@/lib/scoring/maturity";
+import { evaluateRiskSignals } from "@/lib/scoring/risk-signals";
+import { MATURITY_LEVELS } from "@/lib/content/maturity-levels";
+import { MATURITY_ANCHORS } from "@/lib/content/maturity-anchors";
+import { CAUSE_HYPOTHESES } from "@/lib/content/cause-hypotheses";
+import { LAYERS } from "@/lib/scoring/layers.config";
 
 function rowToLayerScores(row: Record<string, unknown>): LayerScore[] {
   return LAYER_IDS.map((layerId) => ({
@@ -17,7 +23,14 @@ function rowToLayerScores(row: Record<string, unknown>): LayerScore[] {
 
 // The result body shared by the public result page and the admin preview
 // popup. Page-specific pieces (CTAs, GA4 tracking) stay with each caller.
-export function ResultReport({ assessment }: { assessment: AssessmentRow }) {
+export function ResultReport({
+  assessment,
+  audience = "public",
+}: {
+  assessment: AssessmentRow;
+  // "admin" additionally shows the consulting-only hypotheses.
+  audience?: "public" | "admin";
+}) {
   const layerScores = rowToLayerScores(assessment as unknown as Record<string, unknown>);
   const bottlenecks = [
     assessment.bottleneck_1,
@@ -33,6 +46,12 @@ export function ResultReport({ assessment }: { assessment: AssessmentRow }) {
     ["31~60일", bottlenecks[1]],
     ["61~90일", bottlenecks[2]],
   ];
+
+  const levelByLayer = Object.fromEntries(
+    layerScores.map((score) => [score.layerId, maturityLevel(score.raw)])
+  ) as Record<LayerId, ReturnType<typeof maturityLevel>>;
+  const riskSignals = evaluateRiskSignals(levelByLayer);
+  const layerNameById = new Map(LAYERS.map((layer) => [layer.id, layer.name]));
 
   return (
     <>
@@ -58,6 +77,41 @@ export function ResultReport({ assessment }: { assessment: AssessmentRow }) {
         <RadarChart layerScores={layerScores} />
       </section>
 
+      <section className="flex flex-col gap-3 break-inside-avoid">
+        <h2 className="text-lg font-bold">레이어별 성숙도</h2>
+        <div className="flex flex-col gap-2.5">
+          {LAYER_IDS.map((layerId) => {
+            const level = levelByLayer[layerId];
+            return (
+              <div
+                key={layerId}
+                className="flex flex-col gap-1 rounded-lg border border-slate-200 p-3 break-inside-avoid"
+              >
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold">{layerNameById.get(layerId)}</p>
+                  <span className="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-semibold text-white">
+                    L{level} {MATURITY_LEVELS[level]}
+                  </span>
+                  <span className="ml-auto flex gap-0.5" aria-hidden="true">
+                    {[1, 2, 3, 4, 5].map((step) => (
+                      <span
+                        key={step}
+                        className={`h-1.5 w-5 rounded-full ${
+                          step <= level ? "bg-slate-900" : "bg-slate-200"
+                        }`}
+                      />
+                    ))}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600">
+                  {MATURITY_ANCHORS[layerId][level]}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
       <p className="text-sm leading-relaxed text-slate-600">{summary}</p>
 
       <section className="flex flex-col gap-3 break-inside-avoid">
@@ -70,6 +124,53 @@ export function ResultReport({ assessment }: { assessment: AssessmentRow }) {
             <p className="mt-1 text-xs text-slate-600">{BOTTLENECK_COPY[layerId]}</p>
           </div>
         ))}
+      </section>
+
+      {riskSignals.length > 0 && (
+        <section className="flex flex-col gap-3 break-inside-avoid">
+          <h2 className="text-lg font-bold">위험 신호</h2>
+          {riskSignals.map((signal) => (
+            <div
+              key={signal.id}
+              className="rounded-lg border border-amber-200 bg-amber-50 p-4 break-inside-avoid"
+            >
+              <p className="text-sm font-semibold text-amber-900">{signal.title}</p>
+              <p className="mt-1 text-xs text-amber-900/80">{signal.message}</p>
+            </div>
+          ))}
+        </section>
+      )}
+
+      <section className="flex flex-col gap-3 break-inside-avoid">
+        <h2 className="text-lg font-bold">가능성 높은 원인 가설</h2>
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <p className="text-xs font-semibold text-slate-500">
+            {layerNameById.get(bottlenecks[0])}가 낮은 원인으로 가장 흔한 경우는 다음과 같습니다.
+          </p>
+          <p className="mt-1.5 text-sm text-slate-800">
+            {CAUSE_HYPOTHESES[bottlenecks[0]].public}
+          </p>
+          <p className="mt-3 text-xs text-slate-500">
+            위 가설이 실제 원인인지, 상담에서 프로세스와 데이터를 함께 확인해 드립니다.
+          </p>
+        </div>
+        {audience === "admin" && (
+          <div className="flex flex-col gap-2 rounded-lg border border-indigo-200 bg-indigo-50 p-4">
+            <p className="text-xs font-semibold text-indigo-900">
+              상담용 가설 (고객 화면에는 보이지 않습니다)
+            </p>
+            {bottlenecks.map((layerId) => (
+              <div key={layerId}>
+                <p className="text-xs font-semibold text-indigo-900">
+                  {layerNameById.get(layerId)}
+                </p>
+                <p className="text-xs text-indigo-900/80">
+                  {CAUSE_HYPOTHESES[layerId].internal}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="flex flex-col gap-3 break-inside-avoid">
