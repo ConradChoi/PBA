@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const NAV_ITEMS = [
   { href: "/admin/consulting-requests", label: "상담 신청" },
   { href: "/admin/assessments", label: "전체 진단" },
+  { href: "/admin/notices", label: "공지사항" },
 ];
 
 export function AdminNav({ isOwner }: { isOwner: boolean }) {
