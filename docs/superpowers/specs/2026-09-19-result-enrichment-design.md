@@ -22,7 +22,7 @@ First, minimal step of the PBA methodology roadmap (Assess → Maturity → Dete
 10. **Headcount is asked once:** the basic-info "팀 규모" free-text field becomes headcount-band chips; the result-page outcome card asks only revenue and growth.
 11. **Two-phase launch** because the privacy policy promises 7 days' notice of changes (section 12):
     - **Phase A (ship now):** maturity, risk signals, hypothesis teaser, CTA change, GA4 URL masking — no new data collected, no policy change.
-    - **Phase B (effective 2026-09-26):** result fit, outcome bands, team-size chips, retention control, consent notice and privacy policy revisions, purge changes. The revised policy is announced on 2026-09-19.
+    - **Phase B (effective = announcement date + 7 days):** result fit, outcome bands, team-size chips, retention control, consent notice and privacy policy revisions, purge changes. The revised policy and its announcement ship first; the effective date is fixed at that moment and written into `PHASE_B_START`.
 12. **Content is drafted by Claude in a review document** (`docs/content/2026-09-19-result-content-draft.md`); implementation proceeds with the drafts.
 13. **4-week checkpoint:** if consult conversion and result-fit averages clear the bar, expand to per-question anchors (140). Not part of this design.
 
@@ -78,7 +78,7 @@ The result URL's assessment UUID is the only credential to view a result, and GA
 
 ---
 
-# Phase B (effective 2026-09-26)
+# Phase B (effective 7 days after the policy announcement ships)
 
 ## B1. Result Fit and Outcome Bands
 
@@ -120,15 +120,15 @@ The daily purge also nulls `industry` (free text, re-identifying in small indust
 
 ## B5. Consent Notice and Privacy Policy
 
-**Consent notice** (`privacy-notice.ts`): add "선택항목(결과 화면에서 입력 시): 매출·성장 구간" and the purpose "진단 정확도 향상"; bump `PRIVACY_NOTICE_VERSION` to `2026-09-26`.
+**Consent notice** (`privacy-notice.ts`): add "선택항목(결과 화면에서 입력 시): 매출·성장 구간" and the purpose "진단 정확도 향상"; bump `PRIVACY_NOTICE_VERSION` to the effective date.
 
-**Privacy policy** (new version effective 2026-09-26; the 2026-09-19 version stays viewable at `/privacy/2026-09-19`):
+**Privacy policy** (new version effective on the date above; the 2026-09-19 version stays viewable at `/privacy/2026-09-19`):
 - §1 purposes: add "진단 방법론 연구·개선(개인을 식별할 수 없는 형태로 가공한 정보에 한함)".
 - §2 "진단 정보" row: "사업 단계, 업종, 팀 규모, 문항 응답과 진단 결과, 결과 적합도 평가, 연 매출·최근 12개월 성장 구간(선택 입력)", note: "익명 진단 시에는 이 정보만으로 개인을 식별할 수 없습니다. 개인정보 수집에 동의하거나 상담을 신청한 경우에는 이름·이메일과 함께 개인정보로 처리됩니다."
 - §3 retention: add "상담·컨설팅 계약을 맺은 경우, 계약 이행과 재진단을 위해 계약에서 정한 기간 동안 보관할 수 있습니다." and "개인정보를 파기할 때 업종 등 자유 입력 정보와 유입 경로 정보도 함께 삭제하여, 남는 진단 정보로는 개인을 알아볼 수 없도록 합니다."
 - §12: note the revision date and link to the previous version.
 
-**Announcement (2026-09-19):** a footer line "개인정보처리방침 개정 안내 (2026-09-26 시행)" linking to the new version with a change summary. Until 2026-09-26, `/privacy` shows the current version; from then on, the new one.
+**Announcement (first Phase B task):** a footer line "개인정보처리방침 개정 안내 ({시행일} 시행)" linking to the new version with a change summary. Until the effective date, `/privacy` shows the current (2026-09-19) version; from then on, the new one. Deploying this announcement fixes the effective date.
 
 **Research queries** use a view excluding name, email, company, and role (`assessments_research`), created in this migration.
 
@@ -142,7 +142,7 @@ The i18n locale migration becomes `0011_add_locale.sql`.
 
 ## B7. Launch Gating
 
-Phase B UI (fit, outcome card, team-size chips) and the retention controls ship behind a date gate `PHASE_B_START = 2026-09-26T00:00:00+09:00` checked server-side, so the code can merge and deploy before the effective date. The migration can be applied at any time (new columns are unused until then).
+Phase B UI (fit, outcome card, team-size chips) and the retention controls ship behind a server-side date gate `PHASE_B_START` (the announced effective date, 00:00 KST), so the code can merge and deploy before it. The migration can be applied at any time (new columns are unused until then).
 
 ## B8. Admin
 
