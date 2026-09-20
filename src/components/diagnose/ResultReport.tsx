@@ -11,6 +11,7 @@ import { evaluateRiskSignals } from "@/lib/scoring/risk-signals";
 import { MATURITY_LEVELS } from "@/lib/content/maturity-levels";
 import { MATURITY_ANCHORS } from "@/lib/content/maturity-anchors";
 import { CAUSE_HYPOTHESES } from "@/lib/content/cause-hypotheses";
+import { subjectParticle } from "@/lib/content/korean-particle";
 import { LAYERS } from "@/lib/scoring/layers.config";
 
 function rowToLayerScores(row: Record<string, unknown>): LayerScore[] {
@@ -52,12 +53,17 @@ export function ResultReport({
       score.layerId,
       // Stored scores are 4-20 by construction, but nothing in the database
       // enforces it; clamp so one bad row degrades this section instead of
-      // failing the whole page render.
-      maturityLevel(Math.min(20, Math.max(4, score.raw))),
+      // failing the whole page render. A non-finite raw (NaN/Infinity) would
+      // pass straight through Math.min/Math.max, so guard it explicitly and
+      // fall back to the lowest valid score.
+      maturityLevel(
+        Number.isFinite(score.raw) ? Math.min(20, Math.max(4, score.raw)) : 4
+      ),
     ])
   ) as Record<LayerId, MaturityLevel>;
   const riskSignals = evaluateRiskSignals(levelByLayer);
   const layerNameById = new Map(LAYERS.map((layer) => [layer.id, layer.name]));
+  const bottleneckLayerName = layerNameById.get(bottlenecks[0]) ?? "";
 
   return (
     <>
@@ -151,7 +157,7 @@ export function ResultReport({
         <h2 className="text-lg font-bold">가능성 높은 원인 가설</h2>
         <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
           <p className="text-xs font-semibold text-slate-500">
-            {layerNameById.get(bottlenecks[0])}가 낮은 원인으로 가장 흔한 경우는 다음과 같습니다.
+            {`${bottleneckLayerName}${subjectParticle(bottleneckLayerName)} 낮은 원인으로 가장 흔한 경우는 다음과 같습니다.`}
           </p>
           <p className="mt-1.5 text-sm text-slate-800">
             {CAUSE_HYPOTHESES[bottlenecks[0]].public}
