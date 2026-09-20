@@ -53,6 +53,15 @@ const assessment: AssessmentRow = {
   privacy_consent_at: "2026-09-01T00:00:00.000Z",
   privacy_notice_version: "v1",
   marketing_consent: false,
+  result_fit: null,
+  result_fit_at: null,
+  revenue_band: null,
+  growth_band: null,
+  outcome_at: null,
+  retain_until: null,
+  retention_reason: null,
+  retention_updated_by: null,
+  retention_updated_at: null,
 };
 
 const internalHypotheses = ["process", "data", "scale"] as const;

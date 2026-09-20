@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getAssessmentById } from "@/lib/assessments/get-assessment";
 import { formatBusinessStage } from "@/lib/content/business-stage";
 import { formatTeamSize } from "@/lib/content/team-size";
+import { RetentionCard } from "@/components/admin/RetentionCard";
 import { ResultReport } from "@/components/diagnose/ResultReport";
 import { ResultPreviewButton } from "@/components/admin/ResultPreviewButton";
 
@@ -67,6 +68,19 @@ export default async function AssessmentDetailPage({
           </div>
         ))}
       </div>
+
+      <RetentionCard
+        assessmentId={assessment.id}
+        hasPersonalData={assessment.email !== null || assessment.name !== null}
+        defaultPurgeAt={new Date(
+          new Date(assessment.privacy_consent_at ?? assessment.created_at).getTime() +
+            365 * 24 * 60 * 60 * 1000
+        ).toISOString()}
+        retainUntil={assessment.retain_until}
+        retentionReason={assessment.retention_reason}
+        retentionUpdatedBy={assessment.retention_updated_by}
+        retentionUpdatedAt={assessment.retention_updated_at}
+      />
 
       <ResultPreviewButton>
         <ResultReport assessment={assessment} audience="admin" />
