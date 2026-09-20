@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getAssessmentById } from "@/lib/assessments/get-assessment";
 import { formatBusinessStage } from "@/lib/content/business-stage";
 import { formatTeamSize } from "@/lib/content/team-size";
+import { growthBandLabel, revenueBandLabel } from "@/lib/assessments/outcome.schema";
 import { RetentionCard } from "@/components/admin/RetentionCard";
 import { ResultReport } from "@/components/diagnose/ResultReport";
 import { ResultPreviewButton } from "@/components/admin/ResultPreviewButton";
@@ -40,6 +41,9 @@ export default async function AssessmentDetailPage({
       `${assessment.privacy_consent ? "동의" : "미동의"} (${assessment.privacy_notice_version})`,
     ],
     ["마케팅 동의", assessment.marketing_consent ? "동의" : "미동의"],
+    ["결과 적합도", assessment.result_fit ? `${assessment.result_fit} / 5` : "-"],
+    ["연 매출", revenueBandLabel(assessment.revenue_band)],
+    ["최근 12개월 성장", growthBandLabel(assessment.growth_band)],
     [
       "UTM",
       [assessment.utm_source, assessment.utm_medium, assessment.utm_campaign]

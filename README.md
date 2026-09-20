@@ -13,13 +13,16 @@ mix code, data, or branding between the two.
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY` (server-only — never commit this or expose
      it to the client)
-3. Apply every file in `supabase/migrations/` (0001-0010) in order, in the
+3. Apply every file in `supabase/migrations/` (0001-0011) in order, in the
    Supabase SQL Editor. They define `assessments`, `assessment_drafts`,
    `consulting_requests`, `notices`, RLS policies, the `reports` and
    `notice-images` storage buckets, and a
    daily pg_cron job (03:00 KST) that enforces the privacy policy's retention
-   periods: personal fields on diagnoses and consulting requests are removed
-   after 1 year, unfinished drafts after 30 days.
+   periods: personal fields on diagnoses (name, email, company, role, industry
+   and UTM) and consulting requests are removed after 1 year, unfinished drafts
+   after 30 days. Rows an operator has put on a retention hold are skipped
+   until the hold expires. Statistics should read the `assessments_research`
+   view, which excludes name, email, company and role.
 4. (Optional) Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` to your GA4 web stream's
    measurement ID (Google Analytics → Admin → Data Streams → your stream).
    Without it, no GA4 script loads.
@@ -86,7 +89,10 @@ are only ever created from `/admin/operators` or the Admin API.
   Unread ones show a NEW badge and light up the header bell; opening a
   request's detail page marks it read.
 - `/admin/assessments` — every completed diagnosis, with a detail page that
-  includes fields the public result page omits (email, UTM, consent).
+  includes fields the public result page omits (email, UTM, consent, result
+  fit, revenue/growth bands). Its 정보 보관 card holds the personal data past
+  the default year with a required reason, reverts to the default, or deletes
+  it now.
 - `/admin/notices` — write and publish announcements. The body is rich text
   (Tiptap), images upload to the `notice-images` bucket, and the HTML is
   sanitized server-side on save (`src/lib/notices/sanitize-notice-html.ts`)
