@@ -6,6 +6,7 @@ import { trackEvent } from "@/lib/analytics/ga4";
 import { PrivacyConsentField } from "@/components/diagnose/PrivacyConsentField";
 import { BUSINESS_STAGES } from "@/lib/content/business-stage";
 import { ChipGroup } from "@/components/ui/ChipGroup";
+import { TEAM_SIZE_BANDS } from "@/lib/content/team-size";
 import type { BusinessStage } from "@/lib/types/assessment";
 
 export default function DiagnosePage() {
@@ -113,14 +114,16 @@ export default function DiagnosePage() {
           />
         </label>
 
-        <label className="flex flex-col gap-1.5 text-sm">
+        <div className="flex flex-col gap-2 text-sm">
           <span className="font-medium text-slate-700">팀 규모 (선택)</span>
-          <input
+          <ChipGroup
+            name="teamSize"
+            label="팀 규모"
+            options={[...TEAM_SIZE_BANDS]}
             value={teamSize}
-            onChange={(e) => setTeamSize(e.target.value)}
-            className="rounded-lg border border-slate-200 px-3.5 py-2.5"
+            onChange={setTeamSize}
           />
-        </label>
+        </div>
 
         <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4">
           <p className="text-xs text-slate-500">

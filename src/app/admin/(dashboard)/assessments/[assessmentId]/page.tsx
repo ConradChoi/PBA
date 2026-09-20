@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAssessmentById } from "@/lib/assessments/get-assessment";
 import { formatBusinessStage } from "@/lib/content/business-stage";
+import { formatTeamSize } from "@/lib/content/team-size";
 import { ResultReport } from "@/components/diagnose/ResultReport";
 import { ResultPreviewButton } from "@/components/admin/ResultPreviewButton";
 
@@ -24,7 +25,7 @@ export default async function AssessmentDetailPage({
     ["역할", assessment.role ?? "-"],
     ["사업 단계", formatBusinessStage(assessment.business_stage, assessment.business_stage_other)],
     ["업종", assessment.industry ?? "-"],
-    ["팀 규모", assessment.team_size ?? "-"],
+    ["팀 규모", formatTeamSize(assessment.team_size)],
     ["총점", `${assessment.total_raw} / 140`],
     ["Architecture Level", assessment.architecture_level],
     [
