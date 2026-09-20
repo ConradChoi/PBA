@@ -4,7 +4,7 @@
 
 **Goal:** Start collecting non-identifying outcome data on the result page, let operators hold a contracted customer's data past the default retention, and land the privacy policy revision those changes require.
 
-**Architecture:** The revised policy ships first and is announced through the notice board, which starts the 7-day clock the policy itself promises. Everything that collects or retains data sits behind one server-side date gate (`PHASE_B_START`), so the code can deploy immediately and switch on by itself on the effective date. New columns go on `assessments`; the daily purge learns about retention holds and clears the free-text fields that make an anonymized row re-identifiable.
+**Architecture:** The policy is published in its complete form, effective the day it ships — the site has only just launched, so this is its first real publication rather than a revision, and no advance notice applies. (Future changes do get an effective date and a notice-board announcement.) Everything therefore goes live as it lands: no date gate. New columns go on `assessments`; the daily purge learns about retention holds and clears the free-text fields that make an anonymized row re-identifiable.
 
 **Tech Stack:** Next.js 15 App Router, Supabase (Postgres + pg_cron), Zod, Vitest.
 
@@ -12,8 +12,8 @@
 
 ## Global Constraints
 
-- **Effective date: 2026-09-27** (announcement 2026-09-20 + 7 days, per the policy's own section 12). It appears once, as `PHASE_B_START` in `src/lib/content/phase-b.ts`, and every gate reads it from there.
-- Everything Phase B collects or exposes is gated server-side: before the effective date the result page and admin show exactly what they show today.
+- **The policy is effective 2026-09-20**, the day it ships. This is the site's first real publication of a privacy policy, so section 12's 7-day notice rule applies to later revisions, not to this one. Every later change bumps the effective date and is announced on the notice board.
+- Nothing is behind a date gate: features ship live.
 - Result fit and outcome bands are **non-identifying diagnosis information**: collected regardless of consent, kept when the 1-year purge anonymizes a row.
 - The 1-year purge must also null `industry` and `utm_source`/`utm_medium`/`utm_campaign` (free text and campaign ids make an "anonymized" row re-identifiable), and must skip rows held by a retention date.
 - Retention control is available to **any operator** (owner or staff), requires a reason, and records who changed it and when.
@@ -25,192 +25,44 @@
 
 ---
 
-### Task 1: Revised privacy policy, archived old version, and the date gate
+### Task 1: Publish the complete privacy policy
 
 **Files:**
-- Create: `src/lib/content/phase-b.ts`
-- Create: `src/lib/content/phase-b.test.ts`
-- Create: `src/components/privacy/PrivacyPolicyV1.tsx`
-- Create: `src/components/privacy/PrivacyPolicyV2.tsx`
-- Create: `src/app/privacy/2026-09-19/page.tsx`
-- Create: `src/app/privacy/2026-09-27/page.tsx`
 - Modify: `src/app/privacy/page.tsx`
 
-**Interfaces:**
-- Produces: `PHASE_B_START` (`"2026-09-27"`), `isPhaseBActive(now?: Date): boolean` — consumed by every later task; `PrivacyPolicyV1`/`PrivacyPolicyV2` components.
+**Interfaces:** none — this task only changes rendered copy.
 
-- [ ] **Step 1: Write the failing gate test**
+- [ ] **Step 1: Apply the policy changes**
 
-Create `src/lib/content/phase-b.test.ts`:
+In `src/app/privacy/page.tsx`, keep the existing structure (`Section`, `Table`, the twelve sections) and make exactly these edits:
 
-```ts
-import { describe, expect, it } from "vitest";
-import { isPhaseBActive, PHASE_B_START } from "./phase-b";
-
-describe("isPhaseBActive", () => {
-  it("is off before the effective date in KST", () => {
-    // 2026-09-26 23:59 KST
-    expect(isPhaseBActive(new Date("2026-09-26T14:59:00Z"))).toBe(false);
-  });
-
-  it("is on from midnight KST on the effective date", () => {
-    // 2026-09-27 00:00 KST
-    expect(isPhaseBActive(new Date("2026-09-26T15:00:00Z"))).toBe(true);
-    expect(isPhaseBActive(new Date("2027-01-01T00:00:00Z"))).toBe(true);
-  });
-
-  it("announces the date the policy revision takes effect", () => {
-    expect(PHASE_B_START).toBe("2026-09-27");
-  });
-});
-```
-
-- [ ] **Step 2: Run it to verify it fails**
-
-Run: `npx vitest run src/lib/content/phase-b.test.ts`
-Expected: FAIL — `Cannot find module './phase-b'`
-
-- [ ] **Step 3: Implement `src/lib/content/phase-b.ts`**
-
-```ts
-// The revised privacy policy was announced on 2026-09-20 and the policy
-// promises 7 days' notice, so everything it covers switches on here.
-export const PHASE_B_START = "2026-09-27";
-
-export function isPhaseBActive(now: Date = new Date()): boolean {
-  // Compare in KST: the effective date is a Korean calendar date.
-  const kstDate = new Date(now.getTime() + 9 * 60 * 60 * 1000)
-    .toISOString()
-    .slice(0, 10);
-
-  return kstDate >= PHASE_B_START;
-}
-```
-
-- [ ] **Step 4: Run it to verify it passes**
-
-Run: `npx vitest run src/lib/content/phase-b.test.ts`
-Expected: PASS (3 tests)
-
-- [ ] **Step 5: Move the current policy into `PrivacyPolicyV1`**
-
-Create `src/components/privacy/PrivacyPolicyV1.tsx` containing the current policy exactly as `src/app/privacy/page.tsx` renders it today: copy the file's `Section`, `Table` helpers and the whole returned `<main>` into an exported `export function PrivacyPolicyV1()`, keeping `const EFFECTIVE_DATE = "2026년 9월 19일";` and every Korean string byte-for-byte. Remove the `metadata` export and the `export default` (they stay on the page files).
-
-- [ ] **Step 6: Create `src/components/privacy/PrivacyPolicyV2.tsx`**
-
-Start from a copy of `PrivacyPolicyV1`, then apply exactly these changes (spec §B5):
-
-1. `const EFFECTIVE_DATE = "2026년 9월 27일";`
+1. `const EFFECTIVE_DATE = "2026년 9월 20일";`
 2. Section 1 list: add a final item — `<li>진단 방법론 연구·개선(개인을 식별할 수 없는 형태로 가공한 정보에 한함)</li>`
 3. Section 2 table, the "진단 정보" row: replace its 항목 cell with `"사업 단계, 업종, 팀 규모, 문항 응답과 진단 결과, 결과 적합도 평가, 연 매출·최근 12개월 성장 구간(선택 입력)"`, and its 수집 시점 cell with `"진단 시 (익명 진단 포함). 익명 진단 시에는 이 정보만으로 개인을 식별할 수 없습니다. 개인정보 수집에 동의하거나 상담을 신청한 경우에는 이름·이메일과 함께 개인정보로 처리됩니다."`
 4. Section 3 list: add two items —
    `<li>상담·컨설팅 계약을 맺은 경우, 계약 이행과 재진단을 위해 계약에서 정한 기간 동안 보관할 수 있습니다.</li>`
    `<li>개인정보를 파기할 때 업종 등 자유 입력 정보와 유입 경로(UTM) 정보도 함께 삭제하여, 남는 진단 정보로는 개인을 알아볼 수 없도록 합니다.</li>`
-5. Section 12: replace the paragraph with
 
-```tsx
-        <p>
-          이 개인정보처리방침은 {EFFECTIVE_DATE}부터 적용됩니다. 내용이 변경되는 경우 시행 7일
-          전부터 서비스를 통해 공지합니다.
-        </p>
-        <p>
-          이전 방침:{" "}
-          <Link href="/privacy/2026-09-19" className="font-medium text-indigo-600 underline">
-            2026년 9월 19일 시행
-          </Link>
-        </p>
-```
+Leave section 12 as it is: it already promises 7 days' notice for future changes, which is the rule from the next revision onward.
 
-with `import Link from "next/link";` at the top of the file.
+- [ ] **Step 2: Verify**
 
-- [ ] **Step 7: Point `/privacy` at the right version**
-
-Replace `src/app/privacy/page.tsx` with:
-
-```tsx
-import type { Metadata } from "next";
-import { PrivacyPolicyV1 } from "@/components/privacy/PrivacyPolicyV1";
-import { PrivacyPolicyV2 } from "@/components/privacy/PrivacyPolicyV2";
-import { isPhaseBActive } from "@/lib/content/phase-b";
-
-export const metadata: Metadata = {
-  title: "개인정보처리방침 | PBA 7-Layer Business Radar",
-};
-
-export default function PrivacyPolicyPage() {
-  // The revised policy takes over on its announced effective date; until
-  // then visitors must still see the policy they agreed to.
-  return isPhaseBActive() ? <PrivacyPolicyV2 /> : <PrivacyPolicyV1 />;
-}
-```
-
-- [ ] **Step 8: Add the permanent version URLs**
-
-`src/app/privacy/2026-09-19/page.tsx`:
-
-```tsx
-import type { Metadata } from "next";
-import { PrivacyPolicyV1 } from "@/components/privacy/PrivacyPolicyV1";
-
-export const metadata: Metadata = {
-  title: "개인정보처리방침 (2026-09-19 시행) | PBA 7-Layer Business Radar",
-};
-
-export default function PrivacyPolicy20260919Page() {
-  return <PrivacyPolicyV1 />;
-}
-```
-
-`src/app/privacy/2026-09-27/page.tsx`:
-
-```tsx
-import type { Metadata } from "next";
-import { PrivacyPolicyV2 } from "@/components/privacy/PrivacyPolicyV2";
-
-export const metadata: Metadata = {
-  title: "개인정보처리방침 (2026-09-27 시행) | PBA 7-Layer Business Radar",
-};
-
-export default function PrivacyPolicy20260927Page() {
-  return <PrivacyPolicyV2 />;
-}
-```
-
-- [ ] **Step 9: Verify both versions render**
-
-Run `npm run typecheck && npm test && npm run build` (no dev server running), then with `npm run dev`:
+Run `npm run typecheck && npm test`, then with `npm run dev`:
 
 ```bash
 curl -s http://localhost:3000/privacy | grep -o "시행일: [^<]*"
-curl -s http://localhost:3000/privacy/2026-09-19 | grep -o "시행일: [^<]*"
-curl -s http://localhost:3000/privacy/2026-09-27 | grep -o "시행일: [^<]*"
+curl -s http://localhost:3000/privacy | grep -c "진단 방법론 연구·개선"
+curl -s http://localhost:3000/privacy | grep -c "계약에서 정한 기간"
 ```
 
-Expected: `/privacy` shows 2026년 9월 19일 (today is before the effective date), `/privacy/2026-09-19` the same, `/privacy/2026-09-27` the revised one. Also confirm the revised page links back to the old version.
+Expected: `시행일: 2026년 9월 20일`, and `1` for both added passages.
 
-- [ ] **Step 10: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
-git add src/lib/content/phase-b.ts src/lib/content/phase-b.test.ts src/components/privacy src/app/privacy
-git commit -m "feat: add the revised privacy policy behind its effective date"
+git add src/app/privacy/page.tsx
+git commit -m "docs: publish the complete privacy policy"
 ```
-
-- [ ] **Step 11: Hand the announcement text to the user**
-
-Report this to the user as the notice to publish from `/admin/notices` (중요 공지, 표시 종료일 2026-09-27):
-
-> **제목:** 개인정보처리방침 개정 안내 (2026년 9월 27일 시행)
->
-> **본문:**
-> 2026년 9월 27일부터 개인정보처리방침이 개정됩니다.
-> 주요 변경 사항은 다음과 같습니다.
-> - 진단 정보에 결과 적합도 평가와 연 매출·최근 12개월 성장 구간(선택 입력)이 추가됩니다.
-> - 이용 목적에 진단 방법론 연구·개선(개인을 식별할 수 없는 형태로 가공한 정보에 한함)이 추가됩니다.
-> - 상담·컨설팅 계약을 맺은 경우 계약에서 정한 기간 동안 개인정보를 보관할 수 있습니다.
-> - 개인정보 파기 시 업종 등 자유 입력 정보와 유입 경로 정보도 함께 삭제합니다.
-> 개정 방침 전문은 [개정 방침 보기](/privacy/2026-09-27)에서 확인하실 수 있습니다.
-
-The date the notice is actually published must be on or before 2026-09-20 for the effective date to hold; if it slips, `PHASE_B_START` and both page routes move with it.
 
 ---
 
@@ -323,7 +175,7 @@ git commit -m "feat: add Phase B columns, research view and retention-aware purg
 - Create: `src/app/api/assessments/[assessmentId]/outcome/route.test.ts`
 
 **Interfaces:**
-- Consumes: `createServiceRoleSupabaseClient` (existing), `isPhaseBActive` (Task 1).
+- Consumes: `createServiceRoleSupabaseClient` (existing).
 - Produces: `resultFitSchema`, `outcomeSchema`, `REVENUE_BANDS`, `GROWTH_BANDS`; `PATCH /api/assessments/[assessmentId]/feedback` → `200 { ok: true }`; `PATCH /api/assessments/[assessmentId]/outcome` → `200 { ok: true }` / `409` — consumed by Task 4.
 
 - [ ] **Step 1: Create `src/lib/assessments/outcome.schema.ts`**
@@ -382,12 +234,6 @@ Create `src/app/api/assessments/[assessmentId]/feedback/route.test.ts`:
 ```ts
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const isPhaseBActive = vi.fn(() => true);
-vi.mock("@/lib/content/phase-b", () => ({
-  isPhaseBActive: () => isPhaseBActive(),
-  PHASE_B_START: "2026-09-27",
-}));
-
 const maybeSingle = vi.fn();
 const eqSelect = vi.fn(() => ({ maybeSingle }));
 const select = vi.fn(() => ({ eq: eqSelect }));
@@ -399,7 +245,6 @@ vi.mock("@/lib/supabase/server", () => ({
 }));
 
 beforeEach(() => {
-  isPhaseBActive.mockReturnValue(true);
   maybeSingle.mockReset().mockResolvedValue({ data: { id: "a1" }, error: null });
   update.mockClear();
   eqUpdate.mockClear();
@@ -438,14 +283,6 @@ describe("PATCH /api/assessments/[assessmentId]/feedback", () => {
 
     expect((await PATCH(patch({ resultFit: 3 }), params)).status).toBe(404);
   });
-
-  it("is closed before the policy revision takes effect", async () => {
-    isPhaseBActive.mockReturnValue(false);
-    const { PATCH } = await import("./route");
-
-    expect((await PATCH(patch({ resultFit: 3 }), params)).status).toBe(404);
-    expect(update).not.toHaveBeenCalled();
-  });
 });
 ```
 
@@ -459,17 +296,11 @@ Expected: FAIL — `Cannot find module './route'`
 ```ts
 import { NextResponse } from "next/server";
 import { resultFitSchema } from "@/lib/assessments/outcome.schema";
-import { isPhaseBActive } from "@/lib/content/phase-b";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase/server";
 
 type RouteParams = { params: Promise<{ assessmentId: string }> };
 
 export async function PATCH(request: Request, { params }: RouteParams) {
-  // Nothing new is collected until the revised policy is in force.
-  if (!isPhaseBActive()) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-
   const { assessmentId } = await params;
   const body = await request.json();
   const parsed = resultFitSchema.safeParse(body);
@@ -510,7 +341,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 - [ ] **Step 5: Run them to verify they pass**
 
 Run: `npx vitest run "src/app/api/assessments/[assessmentId]/feedback/route.test.ts"`
-Expected: PASS (4 tests)
+Expected: PASS (3 tests)
 
 - [ ] **Step 6: Write the failing outcome tests**
 
@@ -518,12 +349,6 @@ Create `src/app/api/assessments/[assessmentId]/outcome/route.test.ts`:
 
 ```ts
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-const isPhaseBActive = vi.fn(() => true);
-vi.mock("@/lib/content/phase-b", () => ({
-  isPhaseBActive: () => isPhaseBActive(),
-  PHASE_B_START: "2026-09-27",
-}));
 
 const maybeSingle = vi.fn();
 const eqSelect = vi.fn(() => ({ maybeSingle }));
@@ -536,7 +361,6 @@ vi.mock("@/lib/supabase/server", () => ({
 }));
 
 beforeEach(() => {
-  isPhaseBActive.mockReturnValue(true);
   maybeSingle.mockReset().mockResolvedValue({ data: { id: "a1", outcome_at: null }, error: null });
   update.mockClear();
   eqUpdate.mockClear();
@@ -595,13 +419,6 @@ describe("PATCH /api/assessments/[assessmentId]/outcome", () => {
     expect((await PATCH(patch({ revenueBand: "lt_100m", growthBand: null }), params)).status).toBe(409);
     expect(update).not.toHaveBeenCalled();
   });
-
-  it("is closed before the policy revision takes effect", async () => {
-    isPhaseBActive.mockReturnValue(false);
-    const { PATCH } = await import("./route");
-
-    expect((await PATCH(patch({ revenueBand: "lt_100m", growthBand: null }), params)).status).toBe(404);
-  });
 });
 ```
 
@@ -615,16 +432,11 @@ Expected: FAIL — `Cannot find module './route'`
 ```ts
 import { NextResponse } from "next/server";
 import { outcomeSchema } from "@/lib/assessments/outcome.schema";
-import { isPhaseBActive } from "@/lib/content/phase-b";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase/server";
 
 type RouteParams = { params: Promise<{ assessmentId: string }> };
 
 export async function PATCH(request: Request, { params }: RouteParams) {
-  if (!isPhaseBActive()) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-
   const { assessmentId } = await params;
   const body = await request.json();
   const parsed = outcomeSchema.safeParse(body);
@@ -674,7 +486,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 - [ ] **Step 9: Run them to verify they pass**
 
 Run: `npx vitest run "src/app/api/assessments/[assessmentId]/outcome/route.test.ts"`
-Expected: PASS (6 tests)
+Expected: PASS (5 tests)
 
 - [ ] **Step 10: Typecheck, full suite, commit**
 
@@ -682,7 +494,7 @@ Run: `npm run typecheck && npm test`
 
 ```bash
 git add src/lib/assessments/outcome.schema.ts "src/app/api/assessments/[assessmentId]/feedback" "src/app/api/assessments/[assessmentId]/outcome"
-git commit -m "feat: add result-fit and outcome API routes behind the phase B gate"
+git commit -m "feat: add result-fit and outcome API routes"
 ```
 
 ---
@@ -874,20 +686,19 @@ export function ResultFeedback({ assessmentId }: { assessmentId: string }) {
 
 - [ ] **Step 3: Render it on the result page**
 
-In `src/app/diagnose/result/[assessmentId]/page.tsx`, add the imports:
+In `src/app/diagnose/result/[assessmentId]/page.tsx`, add the import:
 
 ```ts
 import { ResultFeedback } from "@/components/diagnose/ResultFeedback";
-import { isPhaseBActive } from "@/lib/content/phase-b";
 ```
 
 and render it immediately before the CTA `<section className="flex flex-col gap-3 print:hidden">`:
 
 ```tsx
-      {isPhaseBActive() && <ResultFeedback assessmentId={assessmentId} />}
+      <ResultFeedback assessmentId={assessmentId} />
 ```
 
-- [ ] **Step 4: Verify both sides of the gate**
+- [ ] **Step 4: Verify**
 
 Run `npm run typecheck && npm test`, then with `npm run dev` and an assessment id:
 
@@ -895,7 +706,7 @@ Run `npm run typecheck && npm test`, then with `npm run dev` and an assessment i
 curl -s http://localhost:3000/diagnose/result/<id> | grep -c "실제 상황과 맞나요"
 ```
 
-Expected: `0` today (before the effective date). Then temporarily edit `PHASE_B_START` in `src/lib/content/phase-b.ts` to a past date, repeat, expect `1`, exercise the chips in a browser, and **restore the constant to `2026-09-27`** before committing (confirm with `git diff src/lib/content/phase-b.ts` showing no change).
+Expected: `1`. Then exercise the chips in a browser: picking a number shows the thank-you line, and the outcome card submits once and then reports it was already submitted.
 
 - [ ] **Step 5: Commit**
 
@@ -1618,14 +1429,12 @@ In `src/app/admin/(dashboard)/assessments/[assessmentId]/page.tsx`, add:
 
 ```ts
 import { RetentionCard } from "@/components/admin/RetentionCard";
-import { isPhaseBActive } from "@/lib/content/phase-b";
 ```
 
 and render it after the field grid, before the "고객 결과 화면 보기" button:
 
 ```tsx
-      {isPhaseBActive() && (
-        <RetentionCard
+      <RetentionCard
           assessmentId={assessment.id}
           hasPersonalData={assessment.email !== null || assessment.name !== null}
           defaultPurgeAt={new Date(
@@ -1635,9 +1444,8 @@ and render it after the field grid, before the "고객 결과 화면 보기" but
           retainUntil={assessment.retain_until}
           retentionReason={assessment.retention_reason}
           retentionUpdatedBy={assessment.retention_updated_by}
-          retentionUpdatedAt={assessment.retention_updated_at}
-        />
-      )}
+        retentionUpdatedAt={assessment.retention_updated_at}
+      />
 ```
 
 - [ ] **Step 15: Extend `AssessmentInsertRow`'s row type**
@@ -1682,7 +1490,7 @@ git commit -m "feat: let operators hold or purge an assessment's personal data"
 
 In `src/lib/content/privacy-notice.ts`:
 
-- `PRIVACY_NOTICE_VERSION` → `"2026-09-27"`
+- `PRIVACY_NOTICE_VERSION` → `"2026-09-20"`
 - `summary` → `"목적: 결과 PDF 발송·상담 안내·진단 정확도 향상 / 필수: 이름·이메일 / 선택: 회사명·역할 / 보유: 수집일로부터 1년"`
 - `itemsCollected` → `"필수항목: 이름, 이메일 주소\n선택항목: 회사/브랜드명, 역할\n선택항목(결과 화면에서 입력 시): 연 매출·최근 12개월 성장 구간"`
 - `purpose` → append ` 또한 입력하신 진단 정보와 성과 구간은 진단 정확도 향상 및 통계 분석에 이용합니다.`
@@ -1708,14 +1516,13 @@ Migration range → `(0001-0011)`. In the Admin panel section, add to the `/admi
 With `npm run dev` running and migration 0011 applied, using `.env.local` credentials:
 
 1. Create an assessment via `POST /api/assessments` with consent, name and email.
-2. `PATCH /api/assessments/<id>/feedback` with `{"resultFit":4}` → expect `404` today (gate closed). Temporarily set `PHASE_B_START` to a past date, restart dev, repeat → `200`; confirm `result_fit` in Supabase.
+2. `PATCH /api/assessments/<id>/feedback` with `{"resultFit":4}` → `200`; confirm `result_fit` in Supabase.
 3. `PATCH /api/assessments/<id>/outcome` with `{"revenueBand":"1b_5b","growthBand":"10_50"}` → `200`; repeat → `409`.
 4. Log in as an operator, `PUT /api/admin/assessments/<id>/retention` with `{"amount":6,"unit":"months","reason":"테스트"}` → `200`; confirm `retain_until` ~6 months out.
 5. Run `select purge_expired_personal_data();` via the REST RPC after back-dating that row's `privacy_consent_at` to two years ago: confirm the row is **not** anonymized while the hold stands; clear the hold with `{"reset":true}`, run again, confirm name/email/industry/UTM are now null and the score columns survive.
 6. `POST /api/admin/assessments/<id>/purge` on a second consented row → confirm the same fields are nulled immediately and its consulting requests are gone.
-7. Confirm `/privacy` still shows the 2026-09-19 policy and `/privacy/2026-09-27` shows the revised one.
-8. Restore `PHASE_B_START` to `2026-09-27` and confirm `git diff src/lib/content/phase-b.ts` is empty.
-9. Delete every assessment created during verification.
+7. Confirm `/privacy` shows 시행일 2026년 9월 20일 with the added passages.
+8. Delete every assessment created during verification.
 
 Report each check's outcome.
 
@@ -1730,8 +1537,8 @@ git commit -m "docs: update the consent notice and admin fields for phase B"
 
 ## Self-Review Notes
 
-- **Spec coverage:** B1 → Tasks 3, 4; B2 → Task 5; B3 → Tasks 2, 6; B4 → Task 2; B5 → Tasks 1, 7; B6 → Task 2; B7 (date gate) → Task 1, applied in Tasks 3, 4, 6; B8 → Tasks 6, 7; B9 (GA4 events) → Task 4.
+- **Spec coverage:** B1 → Tasks 3, 4; B2 → Task 5; B3 → Tasks 2, 6; B4 → Task 2; B5 → Tasks 1, 7; B6 → Task 2; B7 (date gate) → dropped: the policy is effective on publication, so nothing needs gating; B8 → Tasks 6, 7; B9 (GA4 events) → Task 4.
 - **Placeholder scan:** no TBD/TODO; every Korean string and SQL statement is written out.
-- **Type consistency:** `PHASE_B_START`/`isPhaseBActive` are defined once (Task 1) and imported everywhere. Band codes exist once in `outcome.schema.ts` (Task 3) and `team-size.ts` (Task 5), and the SQL `check` constraints in Task 2 list the same strings. `retentionUntil`/`retentionSchema` live in `retention.ts` (Task 6) and are used by that task's route only. `AssessmentRow` gains the new columns in Task 6 Step 15, which is what Tasks 6-7's admin code reads.
-- **Ordering:** Task 1 ships the policy and starts the 7-day clock; Task 2 asks the user to apply the migration; Tasks 3-7 need it applied. Nothing before the effective date changes what a visitor sees, so the whole set can deploy as it lands.
+- **Type consistency:** Band codes exist once in `outcome.schema.ts` (Task 3) and `team-size.ts` (Task 5), and the SQL `check` constraints in Task 2 list the same strings. `retentionUntil`/`retentionSchema` live in `retention.ts` (Task 6) and are used by that task's route only. `AssessmentRow` gains the new columns in Task 6 Step 15, which is what Tasks 6-7's admin code reads.
+- **Ordering:** Task 1 ships the policy; Task 2 asks the user to apply the migration; Tasks 3-7 need it applied. Each task is deployable on its own, but Tasks 3-7 should not reach production before the policy in Task 1 does, since they collect what it describes.
 - **Known deviation:** the purge's consulting-request delete uses a `not in (select …)` subquery rather than a join, matching the plain-SQL style of `0009`.
