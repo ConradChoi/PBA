@@ -2,7 +2,7 @@
 
 **Status:** Approved for planning (revised after privacy review)
 **Builds on:** the result page, `ResultReport`, anonymous diagnosis, and print-to-PDF as of commit `0293f0c`
-**Precedes:** multi-language support (`docs/superpowers/specs/2026-09-19-i18n-design.md`); its migration moves from `0010` to `0011`
+**Precedes:** multi-language support (`docs/superpowers/specs/2026-09-19-i18n-design.md`). Migration numbering: notices take `0010`, this design `0011`, i18n `0012`
 
 ## Goal
 
@@ -132,13 +132,13 @@ The daily purge also nulls `industry` (free text, re-identifying in small indust
 
 **Research queries** use a view excluding name, email, company, and role (`assessments_research`), created in this migration.
 
-## B6. Data (migration `0010_result_enrichment.sql`)
+## B6. Data (migration `0011_result_enrichment.sql`)
 
 - `assessments`: `result_fit smallint check 1–5`, `result_fit_at`, `revenue_band` and `growth_band` (checked code lists), `outcome_at`, `retain_until`, `retention_reason`, `retention_updated_by`, `retention_updated_at`.
 - `assessments_research` view.
 - `purge_expired_personal_data()` replaced per B3/B4.
 
-The i18n locale migration becomes `0011_add_locale.sql`.
+The i18n locale migration becomes `0012_add_locale.sql` (`0010` is taken by notices).
 
 ## B7. Launch Gating
 
