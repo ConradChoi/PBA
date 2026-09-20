@@ -4,6 +4,7 @@ import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { MaskedPageLocation } from "@/components/analytics/MaskedPageLocation";
 import { PublicOnly } from "@/components/site/PublicOnly";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { NoticeBanner } from "@/components/site/NoticeBanner";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import "./globals.css";
 
@@ -32,6 +33,7 @@ export default function RootLayout({
         ) : null}
         <PublicOnly>
           <SiteHeader />
+          <NoticeBanner />
         </PublicOnly>
         <div className="flex flex-1 flex-col">{children}</div>
         <PublicOnly>

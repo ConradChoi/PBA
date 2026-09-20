@@ -14,3 +14,28 @@
     print-color-adjust: exact;
   }
 }
+
+/* Notice bodies are sanitized HTML from the admin editor; Tailwind's reset
+   removes the default element styling, so restore just what the allowlist
+   can produce. */
+.notice-body h2 {
+  @apply mt-4 text-lg font-bold text-slate-900;
+}
+.notice-body h3 {
+  @apply mt-3 text-base font-semibold text-slate-900;
+}
+.notice-body ul {
+  @apply list-disc pl-5;
+}
+.notice-body ol {
+  @apply list-decimal pl-5;
+}
+.notice-body a {
+  @apply font-medium text-indigo-600 underline;
+}
+.notice-body blockquote {
+  @apply border-l-2 border-slate-200 pl-3 text-slate-500;
+}
+.notice-body img {
+  @apply my-3 max-w-full rounded-lg;
+}
