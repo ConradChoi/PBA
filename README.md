@@ -67,6 +67,10 @@ measurement ID configured, or an ad blocker).
 - `radar_consulting_submit` — consult form submitted
 - `radar_pdf_request` — "결과 PDF 저장 · 인쇄" on the result page (opens the
   print dialog; print styles give a clean A4 PDF via "Save as PDF")
+- Page paths containing an assessment or draft id are masked
+  (`/diagnose/result/:id`) before gtag sees them — see
+  `src/lib/analytics/mask-path.ts` and
+  `src/components/analytics/MaskedPageLocation.tsx`.
 
 ## Admin panel
 
@@ -106,7 +110,8 @@ Implemented: project scaffold, Supabase client wiring, the scoring/level/
 bottleneck engine, the `assessments` write path, GA4 setup, and the full
 `/diagnose` flow (basic info → 7-layer question wizard, resumable via
 server-persisted drafts → result page with Radar chart, summary,
-bottleneck/strength cards, and a 90-day priority timeline), the consulting
+per-layer maturity, risk signals, a cause hypothesis, bottleneck/strength
+cards, and a 90-day priority timeline), the consulting
 request flow (`/diagnose/result/[assessmentId]/consult`), and the admin
 panel described above.
 
