@@ -13,9 +13,10 @@ mix code, data, or branding between the two.
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY` (server-only — never commit this or expose
      it to the client)
-3. Apply every file in `supabase/migrations/` (0001-0009) in order, in the
+3. Apply every file in `supabase/migrations/` (0001-0010) in order, in the
    Supabase SQL Editor. They define `assessments`, `assessment_drafts`,
-   `consulting_requests`, RLS policies, the `reports` storage bucket, and a
+   `consulting_requests`, `notices`, RLS policies, the `reports` and
+   `notice-images` storage buckets, and a
    daily pg_cron job (03:00 KST) that enforces the privacy policy's retention
    periods: personal fields on diagnoses and consulting requests are removed
    after 1 year, unfinished drafts after 30 days.
@@ -86,6 +87,12 @@ are only ever created from `/admin/operators` or the Admin API.
   request's detail page marks it read.
 - `/admin/assessments` — every completed diagnosis, with a detail page that
   includes fields the public result page omits (email, UTM, consent).
+- `/admin/notices` — write and publish announcements. The body is rich text
+  (Tiptap), images upload to the `notice-images` bucket, and the HTML is
+  sanitized server-side on save (`src/lib/notices/sanitize-notice-html.ts`)
+  so every render trusts the stored row. Published notices appear at
+  `/notice`; one marked important shows in a dismissible banner on every
+  public page until its end date.
 - `/admin/operators` — owner-only. Add or delete operators. An owner can't
   delete their own account or the last remaining owner.
 - `/admin/account` — every operator can change their own password (current
@@ -112,8 +119,8 @@ bottleneck engine, the `assessments` write path, GA4 setup, and the full
 server-persisted drafts → result page with Radar chart, summary,
 per-layer maturity, risk signals, a cause hypothesis, bottleneck/strength
 cards, and a 90-day priority timeline), the consulting
-request flow (`/diagnose/result/[assessmentId]/consult`), and the admin
-panel described above.
+request flow (`/diagnose/result/[assessmentId]/consult`), the notice board
+(`/notice`), and the admin panel described above.
 
 **Not yet implemented** (future plans): Phase 2 (server-side PDF and Resend
 email delivery) and multi-language support.
