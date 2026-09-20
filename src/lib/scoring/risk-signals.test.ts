@@ -23,8 +23,10 @@ describe("evaluateRiskSignals", () => {
   });
 
   it("returns at most two, in priority order", () => {
-    // process 2 + scale 2 (priority 1), data 4 + process 2 (priority 3),
-    // experience 2 + data 2 does not hold because data is 4.
+    // Three rules match: process 2 + scale 2 (priority 1, founder_bottleneck),
+    // data 4 + process 2 (priority 3, automation_before_process), and
+    // customer 2 + offer 4 (priority 4, offer_without_customer). The cap of
+    // two discards the lowest-priority match (offer_without_customer).
     const result = evaluateRiskSignals(
       levels({ process: 2, scale: 2, data: 4, customer: 2, offer: 4 })
     );
