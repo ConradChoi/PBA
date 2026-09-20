@@ -6,7 +6,7 @@ export function SiteFooter() {
     <footer className="border-t border-slate-200 bg-slate-50 print:hidden">
       <div className="mx-auto flex max-w-3xl flex-col gap-2 px-4 py-8 text-xs text-slate-500">
         <div className="flex gap-4">
-          <Link href="/notice" className="font-bold text-slate-900">
+          <Link href="/notice" className="text-slate-600">
             공지사항
           </Link>
           <Link href="/privacy" className="font-bold text-slate-900">
