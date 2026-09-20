@@ -16,4 +16,6 @@ export type AnalyticsEventName =
   | "radar_result_view"
   | "radar_pdf_request"
   | "radar_consulting_click"
-  | "radar_consulting_submit";
+  | "radar_consulting_submit"
+  | "radar_result_feedback"
+  | "radar_outcome_submit";

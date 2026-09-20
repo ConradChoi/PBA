@@ -5,6 +5,7 @@ import { TrackResultView } from "@/components/diagnose/TrackResultView";
 import { ConsultingCtaLink } from "@/components/diagnose/ConsultingCtaLink";
 import { ResultReport } from "@/components/diagnose/ResultReport";
 import { PrintResultButton } from "@/components/diagnose/PrintResultButton";
+import { ResultFeedback } from "@/components/diagnose/ResultFeedback";
 
 export default async function ResultPage({
   params,
@@ -22,6 +23,8 @@ export default async function ResultPage({
     <main className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-10 print:max-w-none print:gap-6 print:p-0">
       <TrackResultView architectureLevel={assessment.architecture_level} />
       <ResultReport assessment={assessment} />
+
+      <ResultFeedback assessmentId={assessmentId} />
 
       <section className="flex flex-col gap-3 print:hidden">
         <ConsultingCtaLink assessmentId={assessmentId} />
