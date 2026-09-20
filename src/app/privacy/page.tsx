@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "개인정보처리방침 | PBA 7-Layer Business Radar",
 };
 
-const EFFECTIVE_DATE = "2026년 9월 19일";
+const EFFECTIVE_DATE = "2026년 9월 20일";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -70,6 +70,7 @@ export default function PrivacyPolicyPage() {
             서비스·이벤트 안내
           </li>
           <li>서비스 이용 통계 분석 및 개선(개인을 식별하지 않는 정보 기준)</li>
+          <li>진단 방법론 연구·개선(개인을 식별할 수 없는 형태로 가공한 정보에 한함)</li>
         </ul>
       </Section>
 
@@ -90,8 +91,8 @@ export default function PrivacyPolicyPage() {
             ],
             [
               "진단 정보",
-              "사업 단계, 업종, 팀 규모, 문항 응답과 진단 결과",
-              "진단 시 (익명 진단 포함). 이 정보만으로는 개인을 식별할 수 없습니다.",
+              "사업 단계, 업종, 팀 규모, 문항 응답과 진단 결과, 결과 적합도 평가, 연 매출·최근 12개월 성장 구간(선택 입력)",
+              "진단 시 (익명 진단 포함). 익명 진단 시에는 이 정보만으로 개인을 식별할 수 없습니다. 개인정보 수집에 동의하거나 상담을 신청한 경우에는 이름·이메일과 함께 개인정보로 처리됩니다.",
             ],
             [
               "자동 수집",
@@ -112,6 +113,14 @@ export default function PrivacyPolicyPage() {
           <li>마케팅 정보 수신 동의: 수집일로부터 1년 또는 수신 동의를 철회할 때까지 중 먼저 도래하는 시점</li>
           <li>진단을 끝까지 완료하지 않은 임시 저장 정보: 마지막 입력일로부터 30일</li>
           <li>개인을 식별할 수 없는 진단 정보: 서비스 개선 및 통계 목적으로 보관할 수 있습니다.</li>
+          <li>
+            상담·컨설팅 계약을 맺은 경우, 계약 이행과 재진단을 위해 계약에서 정한 기간 동안
+            보관할 수 있습니다.
+          </li>
+          <li>
+            개인정보를 파기할 때 업종 등 자유 입력 정보와 유입 경로(UTM) 정보도 함께 삭제하여, 남는
+            진단 정보로는 개인을 알아볼 수 없도록 합니다.
+          </li>
         </ul>
       </Section>
 
