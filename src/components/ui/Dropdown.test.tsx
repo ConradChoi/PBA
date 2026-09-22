@@ -75,6 +75,17 @@ describe("Dropdown", () => {
     });
   }
 
+  // A real .focus() call, not a synthetic event: jsdom fires the native,
+  // bubbling `focusout`/`focusin` pair itself (with `relatedTarget` set to
+  // the other element), which is what React's onBlur/onFocus delegate to
+  // -- the same sequence a real Tab keypress or arrow-key-driven
+  // itemRefs.current[i]?.focus() call produces.
+  function moveFocusTo(element: HTMLElement) {
+    act(() => {
+      element.focus();
+    });
+  }
+
   it("renders closed with listbox aria wiring on the trigger", () => {
     renderDropdown(() => {});
 
@@ -183,5 +194,37 @@ describe("Dropdown", () => {
 
     keydown(opts[2], "ArrowDown");
     expect(document.activeElement).toBe(opts[0]);
+  });
+
+  it("closes when focus leaves the component entirely (e.g. a Tab-out), without stealing focus back", () => {
+    renderDropdown(() => {});
+    click(trigger());
+    const opts = options();
+    expect(document.activeElement).toBe(opts[0]);
+
+    const outside = document.createElement("button");
+    document.body.appendChild(outside);
+
+    moveFocusTo(outside);
+
+    expect(listbox()).toBeNull();
+    expect(trigger().getAttribute("aria-expanded")).toBe("false");
+    // A Tab-out should land where the user tabbed to, not bounce back.
+    expect(document.activeElement).toBe(outside);
+
+    outside.remove();
+  });
+
+  it("does not close when focus moves between options inside the panel", () => {
+    renderDropdown(() => {});
+    click(trigger());
+    const opts = options();
+    expect(document.activeElement).toBe(opts[0]);
+
+    moveFocusTo(opts[1]);
+
+    expect(listbox()).not.toBeNull();
+    expect(trigger().getAttribute("aria-expanded")).toBe("true");
+    expect(document.activeElement).toBe(opts[1]);
   });
 });

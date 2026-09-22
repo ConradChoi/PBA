@@ -28,12 +28,16 @@ export function Dropdown({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
 
-  function close() {
+  function close({ refocusTrigger = true }: { refocusTrigger?: boolean } = {}) {
     setOpen(false);
     setActiveIndex(-1);
-    // Keyboard and screen-reader users land back where they started
-    // instead of losing their place when the panel disappears.
-    triggerRef.current?.focus();
+    if (refocusTrigger) {
+      // Keyboard and screen-reader users land back where they started
+      // instead of losing their place when the panel disappears. This is
+      // for explicit dismissals (Escape, outside click, picking an item) --
+      // a Tab-out should land wherever the user tabbed to instead.
+      triggerRef.current?.focus();
+    }
   }
 
   function openMenu() {
@@ -89,6 +93,21 @@ export function Dropdown({
     }
   }
 
+  function handleBlur(event: React.FocusEvent<HTMLDivElement>) {
+    if (!open) return;
+
+    // `relatedTarget` is the element gaining focus. Arrow-key navigation
+    // moves focus between options inside this same wrapper and must not
+    // close the panel; a Tab (or click, elsewhere) moves it outside the
+    // wrapper -- or `relatedTarget` is null, e.g. the browser chrome takes
+    // focus -- and that should close it. Not refocusing the trigger here
+    // lets a keyboard user's Tab actually land where they tabbed to.
+    const nextFocused = event.relatedTarget as Node | null;
+    if (!nextFocused || !containerRef.current?.contains(nextFocused)) {
+      close({ refocusTrigger: false });
+    }
+  }
+
   function handleTriggerKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
@@ -113,7 +132,7 @@ export function Dropdown({
   }
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative" onBlur={handleBlur}>
       <button
         type="button"
         ref={triggerRef}
