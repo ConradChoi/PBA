@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { COMPANY } from "@/lib/content/company";
+import { companyFor } from "@/lib/content/company";
 
 export const metadata: Metadata = {
   title: "개인정보처리방침 | PBA 7-Layer Business Radar",
@@ -46,14 +46,16 @@ function Table({ head, rows }: { head: string[]; rows: string[][] }) {
 }
 
 export default function PrivacyPolicyPage() {
-  const officer = COMPANY.privacyOfficer;
+  // This page's copy is entirely Korean regardless of visitor locale (Task 4
+  // translates it), so the company block is pinned to "ko" here.
+  const company = companyFor("ko");
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-10">
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-bold">개인정보처리방침</h1>
         <p className="text-sm leading-relaxed text-slate-600">
-          {COMPANY.name}(이하 &lsquo;회사&rsquo;)는 PBA 7-Layer Business Radar(이하 &lsquo;서비스&rsquo;)를
+          {company.name}(이하 &lsquo;회사&rsquo;)는 PBA 7-Layer Business Radar(이하 &lsquo;서비스&rsquo;)를
           운영하면서 「개인정보 보호법」에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을
           신속하고 원활하게 처리할 수 있도록 다음과 같이 개인정보처리방침을 수립·공개합니다.
         </p>
@@ -192,9 +194,9 @@ export default function PrivacyPolicyPage() {
         <Table
           head={["구분", "내용"]}
           rows={[
-            ["성명", `${officer.name} (${officer.position})`],
-            ["이메일", officer.email],
-            ["연락처", officer.phone],
+            ["성명", `${company.ceo} (${company.ceoTitle})`],
+            ["이메일", company.email],
+            ["연락처", company.phone],
           ]}
         />
       </Section>

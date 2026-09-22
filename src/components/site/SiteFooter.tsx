@@ -1,28 +1,35 @@
 import Link from "next/link";
-import { COMPANY } from "@/lib/content/company";
+import { getLocale, getTranslations } from "next-intl/server";
+import { companyFor } from "@/lib/content/company";
+import type { Locale } from "@/i18n/locales";
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const locale = (await getLocale()) as Locale;
+  const company = companyFor(locale);
+  const t = await getTranslations("common");
+
   return (
     <footer className="border-t border-slate-200 bg-slate-50 print:hidden">
       <div className="mx-auto flex max-w-3xl flex-col gap-2 px-4 py-8 text-xs text-slate-500">
         <div className="flex gap-4">
           <Link href="/notice" className="text-slate-600">
-            공지사항
+            {t("notice")}
           </Link>
           <Link href="/privacy" className="font-bold text-slate-900">
-            개인정보처리방침
+            {t("privacy")}
           </Link>
         </div>
         <p>
-          {COMPANY.name} | 대표 {COMPANY.ceo} | 사업자등록번호 {COMPANY.businessNumber}
+          {company.name} | {company.ceoTitle} {company.ceo} | {company.businessNumberLabel}{" "}
+          {company.businessNumber}
         </p>
         <p>
-          {COMPANY.address} | 문의{" "}
-          <a href={`mailto:${COMPANY.email}`} className="underline">
-            {COMPANY.email}
+          {company.address} | {t("contact")}{" "}
+          <a href={`mailto:${company.email}`} className="underline">
+            {company.email}
           </a>
         </p>
-        <p>© 2026 {COMPANY.nameEn} All rights reserved.</p>
+        <p>{t("copyright")}</p>
       </div>
     </footer>
   );
