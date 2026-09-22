@@ -10,8 +10,11 @@ const ko = {
     copyright: "© 2026 YLIA Co., Ltd. All rights reserved.",
     contact: "문의",
     noticeClose: "공지 닫기",
+    noticeEmpty: "등록된 공지사항이 없습니다.",
+    noticeBackToList: "← 공지사항 목록",
     // The result and consult not-found pages share identical copy; the
-    // draft one (mid-diagnosis) reads differently.
+    // draft one (mid-diagnosis) reads differently. The notice one has no
+    // description line, only a title and a back-to-list link.
     notFound: {
       draft: {
         title: "진단을 찾을 수 없습니다",
@@ -22,6 +25,10 @@ const ko = {
         title: "결과를 찾을 수 없습니다",
         description: "링크가 잘못되었거나 만료되었을 수 있습니다.",
         cta: "새로 진단 시작하기",
+      },
+      notice: {
+        title: "공지를 찾을 수 없습니다",
+        cta: "공지사항 목록으로",
       },
     },
   },
@@ -396,10 +403,151 @@ const ko = {
       viewResult: "진단 결과 다시 보기",
     },
   },
-  privacy: {},
+  // The legal policy at /privacy. Copied byte-for-byte from the reviewed
+  // Korean document; section titles, table cells and every punctuation mark
+  // (·, ~, parentheses) must match the source exactly. Company details are
+  // never hardcoded here -- they come from companyFor(locale) at render time.
+  privacy: {
+    title: "개인정보처리방침",
+    intro:
+      "{company}(이하 ‘회사’)는 PBA 7-Layer Business Radar(이하 ‘서비스’)를 운영하면서 「개인정보 보호법」에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 다음과 같이 개인정보처리방침을 수립·공개합니다.",
+    effectiveDate: "2026년 9월 20일",
+    effectiveDateLabel: "시행일: {date}",
+    // Later locale files put a convenience-translation disclaimer here
+    // ("this translation is for convenience; the Korean version prevails").
+    // Empty in ko so nothing renders on the Korean page.
+    translationNotice: "",
+    section1: {
+      title: "1. 개인정보의 처리 목적",
+      intro: "회사는 다음 목적을 위해 개인정보를 처리하며, 목적이 변경되는 경우 사전에 동의를 받습니다.",
+      items: [
+        "진단 결과 리포트(PDF) 이메일 발송",
+        "진단 결과에 기반한 상담(컨설팅) 신청 접수, 안내 및 연락",
+        "마케팅 정보 제공(별도 동의 시): 뉴스레터·인사이트 이메일, 세미나·프로그램 안내, 신규 서비스·이벤트 안내",
+        "서비스 이용 통계 분석 및 개선(개인을 식별하지 않는 정보 기준)",
+        "진단 방법론 연구·개선(개인을 식별할 수 없는 형태로 가공한 정보에 한함)",
+      ],
+    },
+    section2: {
+      title: "2. 처리하는 개인정보 항목",
+      intro:
+        "진단은 개인정보 수집·이용에 동의하지 않아도 이용할 수 있습니다(익명 진단). 이 경우 이름, 이메일 등 개인을 식별할 수 있는 정보는 수집하지 않습니다.",
+      table: {
+        head: ["구분", "항목", "수집 시점"],
+        rows: [
+          ["필수 (동의 시)", "이름, 이메일 주소", "진단 시작 시 개인정보 수집·이용에 동의한 경우"],
+          ["선택 (동의 시)", "회사/브랜드명, 역할", "진단 시작 시 개인정보 수집·이용에 동의한 경우"],
+          [
+            "필수 (상담 신청 시)",
+            "이름, 이메일 주소, 상담 요청 메시지(선택)",
+            "익명 진단 후 상담을 신청하는 경우, 신청 화면에서 동의를 받아 수집",
+          ],
+          [
+            "진단 정보",
+            "사업 단계, 업종, 팀 규모, 문항 응답과 진단 결과, 결과 적합도 평가, 연 매출·최근 12개월 성장 구간(선택 입력)",
+            "진단 시 (익명 진단 포함). 익명 진단 시에는 이 정보만으로 개인을 식별할 수 없습니다. 개인정보 수집에 동의하거나 상담을 신청한 경우에는 이름·이메일과 함께 개인정보로 처리됩니다.",
+          ],
+          [
+            "자동 수집",
+            "쿠키 식별자, 방문 페이지·이용 이벤트, 기기·브라우저 정보, 유입 경로(UTM)",
+            "서비스 이용 시 (6항 참조)",
+          ],
+        ],
+      },
+      note: "회사는 만 14세 미만 아동의 개인정보를 수집하지 않습니다.",
+    },
+    section3: {
+      title: "3. 개인정보의 처리 및 보유 기간",
+      items: [
+        "진단·상담 신청 시 수집한 개인정보: 수집일로부터 1년. 단, 정보주체가 동의를 철회하거나 삭제를 요청하면 지체 없이 파기합니다.",
+        "마케팅 정보 수신 동의: 수집일로부터 1년 또는 수신 동의를 철회할 때까지 중 먼저 도래하는 시점",
+        "진단을 끝까지 완료하지 않은 임시 저장 정보: 마지막 입력일로부터 30일",
+        "개인을 식별할 수 없는 진단 정보: 서비스 개선 및 통계 목적으로 보관할 수 있습니다.",
+        "상담·컨설팅 계약을 맺은 경우, 계약 이행과 재진단을 위해 계약에서 정한 기간 동안 보관할 수 있습니다.",
+        "개인정보를 파기할 때 업종 등 자유 입력 정보와 유입 경로(UTM) 정보도 함께 삭제하여, 남는 진단 정보로는 개인을 알아볼 수 없도록 합니다.",
+      ],
+    },
+    section4: {
+      title: "4. 개인정보의 파기 절차 및 방법",
+      body: "보유 기간이 지나거나 처리 목적이 달성된 개인정보는 지체 없이 파기합니다. 전자적 파일 형태의 정보는 복구할 수 없는 방법으로 영구 삭제합니다.",
+    },
+    section5: {
+      title: "5. 개인정보의 제3자 제공 및 처리 위탁",
+      intro: "회사는 정보주체의 개인정보를 제3자에게 제공하지 않습니다. 서비스 운영을 위해 다음과 같이 처리를 위탁합니다.",
+      table: {
+        head: ["수탁자", "위탁 업무", "보관 위치"],
+        rows: [
+          ["Supabase, Inc.", "데이터베이스 및 운영자 인증 시스템 운영", "대한민국 (AWS 서울 리전)"],
+          ["Amazon Web Services, Inc.", "웹 서비스 호스팅", "대한민국 (서울 리전)"],
+        ],
+      },
+      note: "위탁 계약 시 개인정보가 안전하게 관리될 수 있도록 관련 사항을 규정하고 감독합니다.",
+    },
+    section6: {
+      title: "6. 개인정보 자동 수집 장치(쿠키)의 설치·운영 및 거부",
+      paragraphs: [
+        "회사는 이용 통계를 분석하기 위해 Google Analytics 4를 사용하며, 이 과정에서 쿠키가 설치됩니다. 쿠키에는 이름·이메일 등 직접적인 식별 정보가 포함되지 않습니다.",
+        "쿠키 저장을 원하지 않으면 브라우저 설정에서 쿠키를 차단하거나, Google 애널리틱스 차단 브라우저 부가기능(tools.google.com/dlpage/gaoptout)을 설치할 수 있습니다. 쿠키를 차단해도 진단 이용에는 제한이 없습니다.",
+      ],
+    },
+    section7: {
+      title: "7. 개인정보의 국외 이전",
+      intro: "Google Analytics 4 이용에 따라 다음 정보가 국외로 이전됩니다.",
+      table: {
+        head: ["항목", "내용"],
+        rows: [
+          ["이전받는 자", "Google LLC (문의: privacy.google.com/contact)"],
+          ["이전 국가", "미국"],
+          ["이전 항목", "쿠키 식별자, 방문 페이지·이용 이벤트, 기기·브라우저 정보"],
+          ["이전 일시 및 방법", "서비스 이용 시 네트워크를 통해 전송"],
+          ["이용 목적", "서비스 이용 통계 분석"],
+          ["보유 기간", "Google Analytics 데이터 보존 설정 기간(최대 14개월)"],
+          ["거부 방법 및 효과", "6항의 방법으로 거부할 수 있으며, 거부해도 서비스 이용에 제한이 없습니다."],
+        ],
+      },
+    },
+    section8: {
+      title: "8. 정보주체의 권리·의무 및 행사 방법",
+      body: "정보주체는 회사에 대해 언제든지 개인정보 열람, 정정, 삭제, 처리정지 및 동의 철회를 요구할 수 있습니다. 아래 개인정보 보호책임자에게 이메일로 요청하시면 지체 없이(10일 이내) 조치하겠습니다. 법정대리인이나 위임을 받은 자를 통해서도 권리를 행사할 수 있습니다.",
+    },
+    section9: {
+      title: "9. 개인정보의 안전성 확보 조치",
+      items: [
+        "개인정보에 접근할 수 있는 운영자를 최소화하고 계정·권한을 분리하여 관리",
+        "데이터베이스 접근 통제(행 단위 보안 정책) 및 서버 전용 인증키 관리",
+        "전송 구간 암호화(HTTPS)",
+        "운영자 비밀번호 변경 시 기존 로그인 세션 무효화",
+      ],
+    },
+    section10: {
+      title: "10. 개인정보 보호책임자",
+      table: {
+        head: ["구분", "내용"],
+        // Values (name, email, phone) come from companyFor(locale) at
+        // render time; only the row labels are translatable copy.
+        rowLabels: ["성명", "이메일", "연락처"],
+      },
+    },
+    section11: {
+      title: "11. 권익침해 구제 방법",
+      intro: "개인정보 침해로 인한 구제를 받기 위해 아래 기관에 분쟁 해결이나 상담을 신청할 수 있습니다.",
+      items: [
+        "개인정보분쟁조정위원회: 1833-6972 (www.kopico.go.kr)",
+        "개인정보침해신고센터: 118 (privacy.kisa.or.kr)",
+        "대검찰청: 1301 (www.spo.go.kr)",
+        "경찰청: 182 (ecrm.police.go.kr)",
+      ],
+    },
+    section12: {
+      title: "12. 개인정보처리방침의 변경",
+      body: "이 개인정보처리방침은 {date}부터 적용됩니다. 내용이 변경되는 경우 시행 7일 전부터 서비스를 통해 공지합니다.",
+    },
+  },
   metadata: {
     siteTitle: "PBA 7-Layer Business Radar",
     siteDescription: "5분이면 현재 사업의 구조적 병목을 확인할 수 있습니다.",
+    privacyTitle: "개인정보처리방침",
+    noticeTitle: "공지사항",
   },
 } as const;
 

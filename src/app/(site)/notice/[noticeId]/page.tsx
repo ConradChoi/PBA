@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { getPublishedNoticeById } from "@/lib/notices/get-notices";
 
 export default async function NoticeDetailPage({
@@ -14,11 +15,13 @@ export default async function NoticeDetailPage({
     notFound();
   }
 
+  const t = await getTranslations("common");
+
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
       <div className="flex flex-col gap-2">
         <Link href="/notice" className="text-sm text-slate-500">
-          ← 공지사항 목록
+          {t("noticeBackToList")}
         </Link>
         <h1 className="text-2xl font-bold">{notice.title}</h1>
         <p className="text-xs text-slate-400">
