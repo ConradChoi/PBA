@@ -23,8 +23,6 @@ const EN = {
   phone: "+82-10-9025-5093",
 };
 
-export const COMPANY_LEGAL_NAME_EN = "YLIA Co., Ltd.";
-
 export function companyFor(locale: Locale) {
   return locale === "ko" ? KO : EN;
 }

@@ -20,11 +20,14 @@ describe("resolveLocale", () => {
   });
 
   it("treats a malformed q as the RFC default of 1, not NaN", () => {
-    // "en" has a malformed q (should default to 1); "ja" has an explicit,
-    // valid, lower q. "en" must still win rather than sort order becoming
-    // undefined behaviour from a NaN comparison.
+    // "ja" has an explicit, valid q of 0.9 and sorts first going in; "en"
+    // has a malformed q (should default to 1) and sorts second going in.
+    // Only a guarded parse promotes "en" ahead of "ja" here -- an
+    // unguarded `Number("abc")` produces NaN, and `b.q - a.q` comparators
+    // treat a NaN result as "no change", so a stable sort would leave the
+    // input order (and wrongly return "ja") if the guard were removed.
     expect(
-      resolveLocale({ cookie: null, acceptLanguage: "en;q=abc,ja;q=0.9", country: null })
+      resolveLocale({ cookie: null, acceptLanguage: "ja;q=0.9,en;q=abc", country: null })
     ).toBe("en");
   });
 

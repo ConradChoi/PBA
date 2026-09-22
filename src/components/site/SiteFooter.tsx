@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { companyFor } from "@/lib/content/company";
-import type { Locale } from "@/i18n/locales";
 
 export async function SiteFooter() {
-  const locale = (await getLocale()) as Locale;
+  const locale = await getLocale();
   const company = companyFor(locale);
   const t = await getTranslations("common");
 
