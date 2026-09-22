@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { getAssessmentById } from "@/lib/assessments/get-assessment";
 import { formatBusinessStage } from "@/lib/content/business-stage";
 import ko from "@/i18n/messages/ko";
-import { growthBandLabel, revenueBandLabel } from "@/lib/assessments/outcome.schema";
 import { RetentionCard } from "@/components/admin/RetentionCard";
 import { ResultReport } from "@/components/diagnose/ResultReport";
 import { ResultPreviewButton } from "@/components/admin/ResultPreviewButton";
@@ -26,6 +25,16 @@ export default async function AssessmentDetailPage({
   const teamSizeLabel = assessment.team_size
     ? ((ko.basicInfo.teamSizes as Record<string, string>)[assessment.team_size] ??
       assessment.team_size)
+    : "-";
+  // revenue_band/growth_band hold a known code, or null if the visitor never
+  // submitted the (optional) outcome form.
+  const revenueBandLabel = assessment.revenue_band
+    ? ((ko.result.feedback.revenueBands as Record<string, string>)[assessment.revenue_band] ??
+      assessment.revenue_band)
+    : "-";
+  const growthBandLabel = assessment.growth_band
+    ? ((ko.result.feedback.growthBands as Record<string, string>)[assessment.growth_band] ??
+      assessment.growth_band)
     : "-";
 
   const fields: [string, string][] = [
@@ -57,8 +66,8 @@ export default async function AssessmentDetailPage({
     ],
     ["마케팅 동의", assessment.marketing_consent ? "동의" : "미동의"],
     ["결과 적합도", assessment.result_fit ? `${assessment.result_fit} / 5` : "-"],
-    ["연 매출", revenueBandLabel(assessment.revenue_band)],
-    ["최근 12개월 성장", growthBandLabel(assessment.growth_band)],
+    ["연 매출", revenueBandLabel],
+    ["최근 12개월 성장", growthBandLabel],
     [
       "UTM",
       [assessment.utm_source, assessment.utm_medium, assessment.utm_campaign]

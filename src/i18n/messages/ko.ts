@@ -347,6 +347,24 @@ const ko = {
       selectAtLeastOne: "한 가지 이상 선택해주세요.",
       alreadySubmitted: "이미 제출되었습니다.",
       saveError: "저장하지 못했습니다. 다시 시도해주세요.",
+      // Codes/order are the stored values (src/lib/assessments/outcome.schema.ts);
+      // only the labels live here.
+      revenueBands: {
+        pre_revenue: "매출 전",
+        lt_100m: "1억 미만",
+        "100m_1b": "1~10억",
+        "1b_5b": "10~50억",
+        "5b_10b": "50~100억",
+        gte_10b: "100억 이상",
+      },
+      growthBands: {
+        decline: "감소",
+        flat: "정체(±10%)",
+        "10_50": "10~50% 성장",
+        "50_100": "50~100% 성장",
+        gte_100: "2배 이상",
+        lt_1y: "1년 미만 사업",
+      },
     },
   },
   consult: {

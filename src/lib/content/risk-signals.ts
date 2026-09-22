@@ -1,8 +1,14 @@
 import type { LayerId } from "../types/assessment";
 import type { MaturityLevel } from "../scoring/maturity";
+import type { Messages } from "@/i18n/messages/ko";
 
 export type RiskSignalRule = {
-  id: string;
+  // Narrowed to the keys `messages.result.riskSignals` actually has (rather
+  // than a bare `string`) so a rule added here without matching copy in
+  // ko.ts fails the build instead of rendering the literal message key to a
+  // visitor. This is a type-only import: it doesn't pull ko.ts's runtime
+  // values (or its size) into this data-only module.
+  id: keyof Messages["result"]["riskSignals"];
   // Lower runs first; at most two signals are ever shown.
   priority: number;
   // Every condition must hold for the signal to fire.

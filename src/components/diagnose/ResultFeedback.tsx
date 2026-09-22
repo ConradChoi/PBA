@@ -5,8 +5,8 @@ import { useTranslations } from "next-intl";
 import { ChipGroup } from "@/components/ui/ChipGroup";
 import { trackEvent } from "@/lib/analytics/ga4";
 import {
-  GROWTH_BANDS,
-  REVENUE_BANDS,
+  GROWTH_BAND_VALUES,
+  REVENUE_BAND_VALUES,
   type GrowthBand,
   type RevenueBand,
 } from "@/lib/assessments/outcome.schema";
@@ -21,6 +21,14 @@ const FIT_OPTIONS = [
 
 export function ResultFeedback({ assessmentId }: { assessmentId: string }) {
   const t = useTranslations("result.feedback");
+  const revenueBandOptions = REVENUE_BAND_VALUES.map((value) => ({
+    value,
+    label: t(`revenueBands.${value}`),
+  }));
+  const growthBandOptions = GROWTH_BAND_VALUES.map((value) => ({
+    value,
+    label: t(`growthBands.${value}`),
+  }));
   const [fit, setFit] = useState("");
   const [fitSaved, setFitSaved] = useState(false);
   const [outcomeOpen, setOutcomeOpen] = useState(false);
@@ -111,7 +119,7 @@ export function ResultFeedback({ assessmentId }: { assessmentId: string }) {
                   <ChipGroup
                     name="revenueBand"
                     label={t("revenueLabel")}
-                    options={[...REVENUE_BANDS]}
+                    options={revenueBandOptions}
                     value={revenueBand}
                     onChange={setRevenueBand}
                     size="sm"
@@ -122,7 +130,7 @@ export function ResultFeedback({ assessmentId }: { assessmentId: string }) {
                   <ChipGroup
                     name="growthBand"
                     label={t("growthLabel")}
-                    options={[...GROWTH_BANDS]}
+                    options={growthBandOptions}
                     value={growthBand}
                     onChange={setGrowthBand}
                     size="sm"
