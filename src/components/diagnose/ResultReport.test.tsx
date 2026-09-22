@@ -2,12 +2,49 @@ import { describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ResultReport } from "./ResultReport";
 import { CAUSE_HYPOTHESES } from "@/lib/content/cause-hypotheses";
+import ko from "@/i18n/messages/ko";
 import type { AssessmentRow } from "@/lib/assessments/get-assessment";
 
 // RadarChart is a client component built on chart.js; it has no reason to
 // render in this server-side markup test, so replace it with a stub.
 vi.mock("@/components/diagnose/RadarChart", () => ({
   RadarChart: () => null,
+}));
+
+// ResultReport is an async Server Component that calls the real
+// `getTranslations` under Next's RSC runtime. Outside that runtime (plain
+// Vitest + react-dom/server), next-intl's server APIs can't resolve
+// request-scoped config, so this stub resolves messages directly from the
+// real `ko` messages object instead -- the same source of truth the
+// component reads from in production, just without the request plumbing.
+// It supports plain `{var}` placeholders and `.raw()`, which is all
+// ResultReport uses; it does not implement full ICU (plural/select).
+vi.mock("next-intl/server", () => ({
+  getTranslations: async ({ namespace }: { locale: string; namespace: string }) => {
+    const messages = ko as unknown as Record<string, unknown>;
+    const resolve = (key: string): unknown =>
+      `${namespace}.${key}`
+        .split(".")
+        .reduce<unknown>(
+          (acc, part) =>
+            acc && typeof acc === "object" ? (acc as Record<string, unknown>)[part] : undefined,
+          messages
+        );
+
+    function t(key: string, vars?: Record<string, string | number>): string {
+      const value = resolve(key);
+      if (typeof value !== "string") {
+        throw new Error(`Test stub: missing string message "${namespace}.${key}"`);
+      }
+      return vars
+        ? value.replace(/\{(\w+)\}/g, (_match, name: string) =>
+            Object.prototype.hasOwnProperty.call(vars, name) ? String(vars[name]) : `{${name}}`
+          )
+        : value;
+    }
+    t.raw = (key: string) => resolve(key);
+    return t;
+  },
 }));
 
 // Raw scores chosen to put layers at distinct maturity levels (4-20 range).
@@ -66,9 +103,17 @@ const assessment: AssessmentRow = {
 
 const internalHypotheses = ["process", "data", "scale"] as const;
 
+// ResultReport is an async Server Component: `renderToStaticMarkup` can't
+// render an async function component directly (it only awaits synchronous
+// trees), so call it as a plain async function and render the element it
+// resolves to instead of mounting `<ResultReport .../>` in the tree.
+async function renderResultReport(props: Parameters<typeof ResultReport>[0]) {
+  return renderToStaticMarkup(await ResultReport(props));
+}
+
 describe("ResultReport privacy invariant", () => {
-  it("never leaks internal consulting hypotheses on the public view (no audience prop)", () => {
-    const html = renderToStaticMarkup(<ResultReport assessment={assessment} />);
+  it("never leaks internal consulting hypotheses on the public view (no audience prop)", async () => {
+    const html = await renderResultReport({ assessment, locale: "ko" });
 
     expect(html).not.toContain("상담용");
     for (const layerId of Object.keys(CAUSE_HYPOTHESES) as (keyof typeof CAUSE_HYPOTHESES)[]) {
@@ -76,10 +121,8 @@ describe("ResultReport privacy invariant", () => {
     }
   });
 
-  it("never leaks internal consulting hypotheses when audience is explicitly public", () => {
-    const html = renderToStaticMarkup(
-      <ResultReport assessment={assessment} audience="public" />
-    );
+  it("never leaks internal consulting hypotheses when audience is explicitly public", async () => {
+    const html = await renderResultReport({ assessment, audience: "public", locale: "ko" });
 
     expect(html).not.toContain("상담용");
     for (const layerId of Object.keys(CAUSE_HYPOTHESES) as (keyof typeof CAUSE_HYPOTHESES)[]) {
@@ -87,10 +130,8 @@ describe("ResultReport privacy invariant", () => {
     }
   });
 
-  it("shows the internal hypotheses for the bottleneck layers when audience is admin", () => {
-    const html = renderToStaticMarkup(
-      <ResultReport assessment={assessment} audience="admin" />
-    );
+  it("shows the internal hypotheses for the bottleneck layers when audience is admin", async () => {
+    const html = await renderResultReport({ assessment, audience: "admin", locale: "ko" });
 
     expect(html).toContain("상담용");
     for (const layerId of internalHypotheses) {

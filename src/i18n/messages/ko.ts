@@ -10,6 +10,20 @@ const ko = {
     copyright: "© 2026 YLIA Co., Ltd. All rights reserved.",
     contact: "문의",
     noticeClose: "공지 닫기",
+    // The result and consult not-found pages share identical copy; the
+    // draft one (mid-diagnosis) reads differently.
+    notFound: {
+      draft: {
+        title: "진단을 찾을 수 없습니다",
+        description: "링크가 잘못되었거나 이미 완료된 진단일 수 있습니다.",
+        cta: "새로 시작하기",
+      },
+      result: {
+        title: "결과를 찾을 수 없습니다",
+        description: "링크가 잘못되었거나 만료되었을 수 있습니다.",
+        cta: "새로 진단 시작하기",
+      },
+    },
   },
   landing: {
     headline: "사업이 막힐 때, 기능보다 구조부터 봅니다.",
@@ -137,8 +151,233 @@ const ko = {
       ],
     },
   },
-  result: {},
-  consult: {},
+  result: {
+    anonymousLabel: "익명 진단",
+    scoreHeading: "Architecture Score {score} / 140",
+    maturityHeading: "레이어별 성숙도",
+    bottleneckHeading: "Business Bottleneck Top 3",
+    riskSignalsHeading: "위험 신호",
+    hypothesisHeading: "가능성 높은 원인 가설",
+    // {layer} arrives pre-formatted: the caller appends the Korean subject
+    // particle (이/가) itself for `ko` and passes the bare layer name for
+    // every other locale, since that grammar rule doesn't apply to them.
+    hypothesisIntro: "{layer} 낮은 원인으로 가장 흔한 경우는 다음과 같습니다.",
+    hypothesisOutro:
+      "위 가설이 실제 원인인지, 상담에서 프로세스와 데이터를 함께 확인해 드립니다.",
+    strengthHeading: "Strength Top 2",
+    actionsHeading: "90-Day Architecture Priority",
+    periods: {
+      p1: "1~30일",
+      p2: "31~60일",
+      p3: "61~90일",
+    },
+    consultingCta: "원인 가설 검증 상담받기",
+    printButton: "결과 PDF 저장 · 인쇄",
+    backHome: "홈으로 돌아가기",
+    printFooter: "PBA 7-Layer Business Radar · pba.ylia.io · 주식회사 일리아",
+    levelCopy: {
+      SYSTEMIZED:
+        "사업 구조가 상당히 체계화되어 있습니다. 다음 과제는 데이터, AI, 자동화, 확장 효율을 높이는 것입니다.",
+      GROWTH_READY:
+        "기본 구조는 갖춰져 있으나 특정 Layer가 성장의 병목이 될 가능성이 있습니다.",
+      STRUCTURE_NEEDED:
+        "서비스는 존재하지만 고객·상품·프로세스·데이터가 충분히 연결되지 않은 상태입니다.",
+      FOUNDER_DEPENDENT:
+        "사업이 대표자 또는 특정 인력의 경험과 판단에 크게 의존하고 있습니다.",
+      IDEA_STAGE:
+        "개발과 마케팅보다 Value · Customer · Offer 정의가 먼저 필요한 단계입니다.",
+    },
+    bottleneck: {
+      value:
+        "고객 문제와 구매 이유가 충분히 선명하지 않습니다. 기능 추가보다 가치 제안을 다시 정의하는 것이 우선입니다.",
+      customer:
+        "누구를 위한 서비스인지 범위가 넓거나 구매자와 사용자가 분리되어 있지 않을 가능성이 있습니다.",
+      offer: "상품 구조와 가격, 반복매출 구조가 충분히 연결되어 있지 않습니다.",
+      experience:
+        "고객 유입부터 재사용까지의 여정 중 이탈 지점을 관리할 필요가 있습니다.",
+      process:
+        "업무가 사람의 기억과 수작업에 의존하고 있습니다. 프로세스 정의와 역할 분리가 우선입니다.",
+      data: "서비스에서 발생하는 데이터가 의사결정과 AI/자동화에 충분히 활용되지 않고 있습니다.",
+      scale:
+        "매출이 늘수록 대표나 팀의 업무시간도 비례해 증가할 가능성이 있습니다.",
+    },
+    strength: {
+      value: "사업이 제공하려는 가치가 비교적 명확합니다.",
+      customer: "핵심 고객과 구매 상황에 대한 이해가 좋은 편입니다.",
+      offer: "핵심 상품과 가격, 반복매출로 이어지는 구조가 비교적 잘 짜여 있습니다.",
+      experience: "고객이 유입되고 구매해 다시 찾아오는 여정이 비교적 잘 설계되어 있습니다.",
+      process: "업무 흐름과 역할이 비교적 잘 정의되어 있습니다.",
+      data: "고객 데이터를 기록하고 활용하는 체계가 비교적 잘 갖춰져 있습니다.",
+      scale: "매출이 늘어도 업무 부담이 과도하게 늘지 않도록 구조가 비교적 잘 갖춰져 있습니다.",
+    },
+    actions: {
+      value: ["핵심 고객 문제 1문장 정의", "기존 대안 비교", "구매 이유 인터뷰"],
+      customer: [
+        "Primary/Secondary/Buyer/User 구분",
+        "JTBD 정의",
+        "구매 Trigger 정리",
+      ],
+      offer: ["Product Ladder 작성", "핵심 상품/옵션 정리", "반복매출 가능성 검토"],
+      experience: ["Customer Journey Map", "전환/이탈 지점 정의", "핵심 CTA 정리"],
+      process: [
+        "AS-IS Process Map",
+        "반복업무 식별",
+        "HUMAN / AI-ASSIST / AUTO 구분",
+      ],
+      data: ["핵심 데이터 정의", "이벤트/행동 로그 정의", "AI Opportunity Map"],
+      scale: [
+        "표준 업무 정의",
+        "대표 의존 업무 제거",
+        "구독/라이선스/파트너 구조 검토",
+      ],
+    },
+    maturityLevels: {
+      1: "미정의",
+      2: "인식",
+      3: "정리",
+      4: "운영",
+      5: "체계화",
+    },
+    maturityAnchors: {
+      value: {
+        1: "고객이 해결하려는 문제와 우리가 주는 가치가 아직 정리되지 않은 상태입니다.",
+        2: "해결하려는 문제는 떠올릴 수 있지만, 한 문장으로 정의하거나 기존 대안과 비교해 설명하지는 못하는 상태입니다.",
+        3: "핵심 문제와 차별점은 정리되어 있지만, 실제 고객이 원하는 가치와 일치하는지는 확인되지 않았습니다.",
+        4: "정리된 가치 제안이 영업·마케팅에 실제로 쓰이고, 고객이 비용을 지불하는 이유를 설명할 수 있습니다.",
+        5: "가치 제안이 고객 인터뷰와 구매·이탈 데이터로 확인되고 주기적으로 갱신됩니다.",
+      },
+      customer: {
+        1: "누가 우리 고객인지 구체적으로 정의되어 있지 않습니다.",
+        2: "대략적인 고객층은 있지만, 사용자와 구매자, 고객별 니즈를 구분하지 않습니다.",
+        3: "핵심 고객과 구매자·사용자는 정의되어 있지만, 구매를 결정하게 만드는 계기는 추정 수준입니다.",
+        4: "고객 정의와 구매 계기가 마케팅·영업 대상을 정하는 데 실제로 쓰이고 있습니다.",
+        5: "고객군별 전환·유지 데이터로 고객 정의를 확인하고 갱신합니다.",
+      },
+      offer: {
+        1: "무엇을 얼마에 파는지가 고객이나 상황마다 달라지는 상태입니다.",
+        2: "핵심 상품은 있지만, 가격 기준과 다음 상품으로 이어지는 구조가 없습니다.",
+        3: "핵심 상품과 가격 기준은 정리되어 있지만, 입문→핵심→고가로 이어지는 구조와 반복 매출은 아직 설계 단계입니다.",
+        4: "상품 사다리와 가격 체계가 실제 판매에 적용되고, 반복 매출이 일부 발생합니다.",
+        5: "상품별 전환율·객단가·재구매 데이터로 상품 구성과 가격을 조정합니다.",
+      },
+      experience: {
+        1: "고객이 어떻게 우리를 알게 되고 어디서 떠나는지 파악되지 않았습니다.",
+        2: "주요 유입 경로는 짐작하지만, 구매 이후의 여정과 이탈 지점은 관리하지 않습니다.",
+        3: "관심부터 재구매까지의 여정은 그려져 있지만, 경험의 질이 담당자에 따라 달라집니다.",
+        4: "설계된 고객 여정이 실제로 운영되고, 주요 이탈 지점을 파악해 대응합니다.",
+        5: "여정 단계별 전환·이탈 데이터를 추적하며 경험을 계속 개선합니다.",
+      },
+      process: {
+        1: "업무가 정해진 흐름 없이 그때그때 사람의 판단으로 처리됩니다.",
+        2: "업무 흐름은 머릿속에 있지만 문서로 정리되지 않았고, 반복 수작업이 많습니다.",
+        3: "주요 프로세스는 정리되어 있지만, 사람과 시스템의 역할은 일부만 나뉘어 있습니다.",
+        4: "정의된 프로세스대로 업무가 돌아가며, 대표나 특정 직원이 빠져도 대부분 처리됩니다.",
+        5: "프로세스 성과를 측정하고, 반복 업무를 자동화하며 계속 개선합니다.",
+      },
+      data: {
+        1: "고객 행동이나 서비스 이용 데이터가 거의 기록되지 않습니다.",
+        2: "일부 데이터는 쌓이지만, 무엇을 왜 수집하는지 정의되어 있지 않습니다.",
+        3: "수집할 데이터와 목적은 정의되어 있지만, 의사결정에는 가끔만 쓰입니다.",
+        4: "데이터를 근거로 고객 경험이나 업무를 실제로 개선하고 있습니다.",
+        5: "데이터가 의사결정의 기본이며, AI·자동화 적용 지점이 구체적으로 운영됩니다.",
+      },
+      scale: {
+        1: "매출이 늘면 대표의 업무시간도 그만큼 늘어나는 구조입니다.",
+        2: "확장이 필요하다고 느끼지만, 업무 표준이나 매뉴얼이 없습니다.",
+        3: "일부 업무는 표준화되어 있지만, 다른 사람이 같은 품질을 내기는 아직 어렵습니다.",
+        4: "표준과 매뉴얼로 다른 사람도 같은 품질을 내며, 반복 매출 구조가 작동합니다.",
+        5: "매출이 늘어도 운영 부담이 비례해 늘지 않고, 구독·라이선스·파트너 구조로 확장합니다.",
+      },
+    },
+    riskSignals: {
+      founder_bottleneck: {
+        title: "대표 의존 병목",
+        message: "업무가 대표에게 묶여 있어, 성장이 대표의 시간에 막힐 가능성이 큽니다.",
+      },
+      scaling_without_structure: {
+        title: "구조 없는 확장",
+        message:
+          "가치 정의가 흐린 상태에서 규모를 키우고 있습니다. 확장할수록 고객 이탈과 가격 압박이 커질 수 있습니다.",
+      },
+      automation_before_process: {
+        title: "정리 전 자동화",
+        message:
+          "데이터·AI 활용에 비해 업무 흐름이 정리되어 있지 않습니다. 정리되지 않은 프로세스를 자동화하면 비효율도 함께 자동화됩니다.",
+      },
+      offer_without_customer: {
+        title: "고객 없는 상품 설계",
+        message:
+          "상품 구조는 갖춰졌지만 핵심 고객 정의가 약합니다. 상품이 고객이 아니라 공급자 관점에서 설계되었을 수 있습니다.",
+      },
+      invisible_churn: {
+        title: "보이지 않는 이탈",
+        message: "고객이 어디서, 왜 떠나는지 보이지 않는 상태입니다. 개선이 감에 의존하게 됩니다.",
+      },
+    },
+    // Public-facing hypotheses only; the admin-only `internal` counterpart
+    // stays Korean-only in src/lib/content/cause-hypotheses.ts and must
+    // never be duplicated here (see ResultReport.test.tsx's privacy test).
+    hypotheses: {
+      value: "고객 인터뷰 없이 공급자 관점에서 가치를 정의했을 가능성이 있습니다.",
+      customer:
+        "'누구나 고객'이라는 넓은 정의로 시작해, 핵심 고객을 좁히지 못했을 가능성이 있습니다.",
+      offer:
+        "고객 요청마다 맞춤으로 대응하다 상품이 표준화되지 않았을 가능성이 있습니다.",
+      experience:
+        "유입과 첫 구매에 집중하느라 구매 이후의 경험이 설계되지 않았을 가능성이 있습니다.",
+      process:
+        "대표가 대부분의 판단을 직접 하면서, 업무 흐름을 문서로 만들 기회가 없었을 가능성이 있습니다.",
+      data: "데이터를 '나중에 볼 것'으로 미뤄, 무엇을 왜 기록할지 정하지 않았을 가능성이 있습니다.",
+      scale:
+        "'대표가 직접 해야 품질이 나온다'는 전제로 운영해, 표준화가 계속 미뤄졌을 가능성이 있습니다.",
+    },
+    feedback: {
+      question: "이 진단 결과가 실제 상황과 맞나요?",
+      fitLabel: "결과 적합도",
+      fitScale: "1 전혀 다르다 · 5 매우 정확하다",
+      fitThanks: "의견 감사합니다. 다음 진단을 개선하는 데 쓰입니다.",
+      fitError: "의견을 저장하지 못했습니다.",
+      outcomeToggle: "더 정확한 분석을 위해 알려주세요 (선택)",
+      outcomeThanks: "알려주셔서 감사합니다.",
+      outcomeNotice:
+        "선택 입력이며 입력하지 않아도 불이익은 없습니다. 진단 정확도 향상과 통계에 쓰이며, 개인정보에 동의하신 경우 이름·이메일과 함께 보관되다가 1년 후 식별 정보가 삭제됩니다.",
+      revenueLabel: "연 매출",
+      growthLabel: "최근 12개월 매출 변화",
+      outcomeSubmit: "안내를 확인했으며 제출합니다",
+      selectAtLeastOne: "한 가지 이상 선택해주세요.",
+      alreadySubmitted: "이미 제출되었습니다.",
+      saveError: "저장하지 못했습니다. 다시 시도해주세요.",
+    },
+  },
+  consult: {
+    backToResult: "← 진단 결과로 돌아가기",
+    title: "상담 신청",
+    // hasName mirrors whether assessment.name is set: "yes" keeps the
+    // Korean honorific phrasing ("{name}님의 진단"), "other" falls back to
+    // the bare "진단" used for an anonymous diagnosis.
+    subtitle:
+      "{hasName, select, yes {{name}님의 진단} other {진단}} 결과를 바탕으로 상담을 도와드리겠습니다.",
+    anonymous: {
+      name: "이름 *",
+      namePlaceholder: "홍길동",
+      email: "연락받을 이메일 *",
+      emailPlaceholder: "you@example.com",
+    },
+    namedEmail: {
+      label: "연락받을 이메일",
+      notice: "진단을 시작할 때 입력하신 이메일로 연락드립니다.",
+    },
+    message: "전달하고 싶은 말 (선택)",
+    submit: "상담 신청하기",
+    submitting: "접수하는 중...",
+    error: "신청을 접수하지 못했습니다. 다시 시도해주세요.",
+    success: {
+      title: "신청이 접수되었습니다",
+      description: "확인 후 {email}(으)로 연락드리겠습니다.",
+      home: "처음으로",
+      viewResult: "진단 결과 다시 보기",
+    },
+  },
   privacy: {},
   metadata: {
     siteTitle: "PBA 7-Layer Business Radar",

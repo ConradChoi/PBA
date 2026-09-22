@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { LAYER_IDS } from "../types/assessment";
-import { ARCHITECTURE_LEVEL_COPY } from "./architecture-level-copy";
-import { BOTTLENECK_COPY } from "./bottleneck-copy";
-import { ACTION_LIBRARY } from "./action-library";
 import ko from "@/i18n/messages/ko";
 
 const ARCHITECTURE_LEVELS = [
@@ -13,27 +10,53 @@ const ARCHITECTURE_LEVELS = [
   "SYSTEMIZED",
 ] as const;
 
-describe("ARCHITECTURE_LEVEL_COPY", () => {
+describe("messages.result.levelCopy", () => {
   it("has non-empty copy for all 5 levels", () => {
     for (const level of ARCHITECTURE_LEVELS) {
-      expect(ARCHITECTURE_LEVEL_COPY[level].length).toBeGreaterThan(0);
+      expect(ko.result.levelCopy[level].length).toBeGreaterThan(0);
     }
   });
 });
 
-describe("BOTTLENECK_COPY", () => {
+describe("messages.result.bottleneck", () => {
   it("has non-empty copy for all 7 layers", () => {
     for (const id of LAYER_IDS) {
-      expect(BOTTLENECK_COPY[id].length).toBeGreaterThan(0);
+      expect(ko.result.bottleneck[id].length).toBeGreaterThan(0);
     }
   });
 });
 
-describe("ACTION_LIBRARY", () => {
+describe("messages.result.actions", () => {
   it("has exactly 3 actions for all 7 layers", () => {
     for (const id of LAYER_IDS) {
-      expect(ACTION_LIBRARY[id]).toHaveLength(3);
-      ACTION_LIBRARY[id].forEach((action) => expect(action.length).toBeGreaterThan(0));
+      expect(ko.result.actions[id]).toHaveLength(3);
+      ko.result.actions[id].forEach((action) => expect(action.length).toBeGreaterThan(0));
+    }
+  });
+});
+
+describe("messages.result.strength", () => {
+  it("has non-empty copy for all 7 layers", () => {
+    for (const id of LAYER_IDS) {
+      expect(ko.result.strength[id].length).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe("messages.result.maturityLevels", () => {
+  it("has a non-empty name for all 5 levels", () => {
+    for (const level of [1, 2, 3, 4, 5] as const) {
+      expect(ko.result.maturityLevels[level].length).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe("messages.result.maturityAnchors", () => {
+  it("has a non-empty anchor for all 7 layers at all 5 levels", () => {
+    for (const id of LAYER_IDS) {
+      for (const level of [1, 2, 3, 4, 5] as const) {
+        expect(ko.result.maturityAnchors[id][level].length).toBeGreaterThan(10);
+      }
     }
   });
 });

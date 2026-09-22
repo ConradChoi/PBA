@@ -24,7 +24,7 @@ const COUNTRY_LOCALE: Record<string, Locale> = {
   MO: "zh-TW",
 };
 
-function isLocale(value: string | null | undefined): value is Locale {
+export function isLocale(value: string | null | undefined): value is Locale {
   return LOCALES.includes(value as Locale);
 }
 

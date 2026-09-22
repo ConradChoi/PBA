@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { getAssessmentById } from "@/lib/assessments/get-assessment";
 import { ConsultForm } from "@/components/diagnose/ConsultForm";
 import { maskEmail } from "@/lib/content/mask-email";
@@ -16,19 +17,24 @@ export default async function ConsultPage({
     notFound();
   }
 
+  const t = await getTranslations("consult");
+  const tCommon = await getTranslations("common");
+
   return (
     <main className="mx-auto flex max-w-md flex-col gap-6 px-4 py-10">
       <Link href={`/diagnose/result/${assessmentId}`} className="text-sm text-slate-500">
-        ← 진단 결과로 돌아가기
+        {t("backToResult")}
       </Link>
       <div className="flex flex-col gap-1">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-          PBA 7-Layer Business Radar
+          {tCommon("brand")}
         </p>
-        <h1 className="text-2xl font-bold">상담 신청</h1>
+        <h1 className="text-2xl font-bold">{t("title")}</h1>
         <p className="text-sm text-slate-500">
-          {assessment.name ? `${assessment.name}님의 진단` : "진단"} 결과를 바탕으로 상담을
-          도와드리겠습니다.
+          {t("subtitle", {
+            hasName: assessment.name ? "yes" : "other",
+            name: assessment.name ?? "",
+          })}
         </p>
       </div>
       <ConsultForm
