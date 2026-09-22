@@ -67,7 +67,10 @@ export function resolveLocale({
         const q = params
           .map((param) => param.trim())
           .find((param) => param.startsWith("q="));
-        return { tag, q: q ? Number(q.slice(2)) : 1 };
+        // RFC default is 1 when absent; a malformed value (e.g. "q=abc")
+        // shouldn't reorder anything either, so it also falls back to 1.
+        const parsedQ = q ? Number(q.slice(2)) : 1;
+        return { tag, q: Number.isFinite(parsedQ) ? parsedQ : 1 };
       })
       .filter((entry) => entry.tag.length > 0)
       .sort((a, b) => b.q - a.q);

@@ -19,6 +19,15 @@ describe("resolveLocale", () => {
     ).toBe("ja");
   });
 
+  it("treats a malformed q as the RFC default of 1, not NaN", () => {
+    // "en" has a malformed q (should default to 1); "ja" has an explicit,
+    // valid, lower q. "en" must still win rather than sort order becoming
+    // undefined behaviour from a NaN comparison.
+    expect(
+      resolveLocale({ cookie: null, acceptLanguage: "en;q=abc,ja;q=0.9", country: null })
+    ).toBe("en");
+  });
+
   it("maps Chinese variants", () => {
     const zh = (tag: string) =>
       resolveLocale({ cookie: null, acceptLanguage: tag, country: null });

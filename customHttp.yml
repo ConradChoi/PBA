@@ -1,0 +1,42 @@
+# One URL serves five languages, so a shared cache (CloudFront/Amplify's
+# CDN) must not hand one visitor's language to another. This duplicates the
+# `Vary` rule in next.config.ts on purpose: Next.js's own App Router
+# response handling currently overwrites a custom `Vary` header set via
+# next.config (confirmed against next@15.5.x — see vercel/next.js#55396 and
+# #85852), so the header never reaches clients from the app itself. Amplify
+# applies these headers at the CDN layer instead, which is where it
+# actually takes effect. The next.config.ts rule stays in place too: it
+# documents intent and will start working on its own if/when Next fixes
+# the upstream bug.
+#
+# Amplify's custom-header patterns don't support negation, so the public
+# paths are listed explicitly instead of excluding /admin and /api.
+customHeaders:
+  - pattern: '/'
+    headers:
+      - key: 'Vary'
+        value: 'Accept-Language, Cookie, CloudFront-Viewer-Country'
+  - pattern: '/diagnose'
+    headers:
+      - key: 'Vary'
+        value: 'Accept-Language, Cookie, CloudFront-Viewer-Country'
+  - pattern: '/diagnose/**'
+    headers:
+      - key: 'Vary'
+        value: 'Accept-Language, Cookie, CloudFront-Viewer-Country'
+  - pattern: '/notice'
+    headers:
+      - key: 'Vary'
+        value: 'Accept-Language, Cookie, CloudFront-Viewer-Country'
+  - pattern: '/notice/**'
+    headers:
+      - key: 'Vary'
+        value: 'Accept-Language, Cookie, CloudFront-Viewer-Country'
+  - pattern: '/privacy'
+    headers:
+      - key: 'Vary'
+        value: 'Accept-Language, Cookie, CloudFront-Viewer-Country'
+  - pattern: '/privacy/**'
+    headers:
+      - key: 'Vary'
+        value: 'Accept-Language, Cookie, CloudFront-Viewer-Country'
