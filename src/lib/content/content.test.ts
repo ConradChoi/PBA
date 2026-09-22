@@ -3,7 +3,7 @@ import { LAYER_IDS } from "../types/assessment";
 import { ARCHITECTURE_LEVEL_COPY } from "./architecture-level-copy";
 import { BOTTLENECK_COPY } from "./bottleneck-copy";
 import { ACTION_LIBRARY } from "./action-library";
-import { QUESTIONS } from "./questions";
+import ko from "@/i18n/messages/ko";
 
 const ARCHITECTURE_LEVELS = [
   "IDEA_STAGE",
@@ -38,11 +38,19 @@ describe("ACTION_LIBRARY", () => {
   });
 });
 
-describe("QUESTIONS", () => {
+describe("wizard.questions", () => {
   it("has exactly 4 questions for all 7 layers", () => {
     for (const id of LAYER_IDS) {
-      expect(QUESTIONS[id]).toHaveLength(4);
-      QUESTIONS[id].forEach((q) => expect(q.length).toBeGreaterThan(0));
+      expect(ko.wizard.questions[id]).toHaveLength(4);
+      ko.wizard.questions[id].forEach((q) => expect(q.length).toBeGreaterThan(0));
+    }
+  });
+});
+
+describe("wizard.layerDescriptions", () => {
+  it("has non-empty copy for all 7 layers", () => {
+    for (const id of LAYER_IDS) {
+      expect(ko.wizard.layerDescriptions[id].length).toBeGreaterThan(0);
     }
   });
 });

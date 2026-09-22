@@ -1,19 +1,16 @@
 import type { BusinessStage } from "@/lib/types/assessment";
 
-export const BUSINESS_STAGES: { value: BusinessStage; label: string }[] = [
-  { value: "idea", label: "아이디어" },
-  { value: "mvp_prep", label: "MVP 준비" },
-  { value: "building", label: "구축 중" },
-  { value: "operating", label: "운영 중" },
-  { value: "growth", label: "성장" },
-  { value: "realign", label: "재정비" },
-  { value: "other", label: "기타" },
+export const BUSINESS_STAGE_VALUES: BusinessStage[] = [
+  "idea",
+  "mvp_prep",
+  "building",
+  "operating",
+  "growth",
+  "realign",
+  "other",
 ];
 
-export function formatBusinessStage(
-  stage: BusinessStage,
-  other: string | null
-): string {
-  const label = BUSINESS_STAGES.find((s) => s.value === stage)?.label ?? stage;
+// The label comes from messages; the free text the person typed does not.
+export function formatBusinessStage(label: string, other: string | null, stage: BusinessStage) {
   return stage === "other" && other ? `${label} (${other})` : label;
 }

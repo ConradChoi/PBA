@@ -2,15 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { trackEvent } from "@/lib/analytics/ga4";
 import { PrivacyConsentField } from "@/components/diagnose/PrivacyConsentField";
-import { BUSINESS_STAGES } from "@/lib/content/business-stage";
+import { BUSINESS_STAGE_VALUES } from "@/lib/content/business-stage";
 import { ChipGroup } from "@/components/ui/ChipGroup";
-import { TEAM_SIZE_BANDS } from "@/lib/content/team-size";
+import { TEAM_SIZE_VALUES } from "@/lib/content/team-size";
 import type { BusinessStage } from "@/lib/types/assessment";
 
 export default function DiagnosePage() {
   const router = useRouter();
+  const t = useTranslations("basicInfo");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -23,6 +25,15 @@ export default function DiagnosePage() {
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const businessStageOptions = BUSINESS_STAGE_VALUES.map((value) => ({
+    value,
+    label: t(`stages.${value}`),
+  }));
+  const teamSizeOptions = TEAM_SIZE_VALUES.map((value) => ({
+    value,
+    label: t(`teamSizes.${value}`),
+  }));
 
   const canSubmit =
     businessStage &&
@@ -62,7 +73,7 @@ export default function DiagnosePage() {
     });
 
     if (!response.ok) {
-      setError("진단을 시작하지 못했습니다. 다시 시도해주세요.");
+      setError(t("error"));
       setSubmitting(false);
       return;
     }
@@ -78,16 +89,16 @@ export default function DiagnosePage() {
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
           PBA 7-Layer Business Radar
         </p>
-        <h1 className="text-2xl font-bold">기본 정보를 알려주세요</h1>
+        <h1 className="text-2xl font-bold">{t("title")}</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <div className="flex flex-col gap-2 text-sm">
-          <span className="font-medium text-slate-700">사업 단계 *</span>
+          <span className="font-medium text-slate-700">{t("businessStage")}</span>
           <ChipGroup
             name="businessStage"
-            label="사업 단계"
-            options={BUSINESS_STAGES}
+            label={t("businessStage")}
+            options={businessStageOptions}
             value={businessStage}
             onChange={setBusinessStage}
           />
@@ -95,18 +106,18 @@ export default function DiagnosePage() {
 
         {businessStage === "other" && (
           <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-slate-700">사업 단계 직접 입력 *</span>
+            <span className="font-medium text-slate-700">{t("businessStageOther")}</span>
             <input
               value={businessStageOther}
               onChange={(e) => setBusinessStageOther(e.target.value)}
-              placeholder="현재 사업 단계를 입력해주세요"
+              placeholder={t("businessStageOtherPlaceholder")}
               className="rounded-lg border border-slate-200 px-3.5 py-2.5"
             />
           </label>
         )}
 
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">업종 (선택)</span>
+          <span className="font-medium text-slate-700">{t("industry")}</span>
           <input
             value={industry}
             onChange={(e) => setIndustry(e.target.value)}
@@ -115,49 +126,46 @@ export default function DiagnosePage() {
         </label>
 
         <div className="flex flex-col gap-2 text-sm">
-          <span className="font-medium text-slate-700">팀 규모 (선택)</span>
+          <span className="font-medium text-slate-700">{t("teamSize")}</span>
           <ChipGroup
             name="teamSize"
-            label="팀 규모"
-            options={[...TEAM_SIZE_BANDS]}
+            label={t("teamSize")}
+            options={teamSizeOptions}
             value={teamSize}
             onChange={setTeamSize}
           />
         </div>
 
         <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">
-            동의하시면 결과 PDF와 상담 안내를 이메일로 받으실 수 있습니다. 동의하지
-            않으셔도 진단과 결과 확인은 그대로 이용하실 수 있습니다.
-          </p>
+          <p className="text-xs text-slate-500">{t("consentIntro")}</p>
           <PrivacyConsentField checked={privacyConsent} onChange={setPrivacyConsent} />
         </div>
 
         {privacyConsent && (
           <>
             <label className="flex flex-col gap-1.5 text-sm">
-              <span className="font-medium text-slate-700">이름 *</span>
+              <span className="font-medium text-slate-700">{t("name")}</span>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="홍길동"
+                placeholder={t("namePlaceholder")}
                 className="rounded-lg border border-slate-200 px-3.5 py-2.5"
               />
             </label>
 
             <label className="flex flex-col gap-1.5 text-sm">
-              <span className="font-medium text-slate-700">이메일 *</span>
+              <span className="font-medium text-slate-700">{t("email")}</span>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder={t("emailPlaceholder")}
                 className="rounded-lg border border-slate-200 px-3.5 py-2.5"
               />
             </label>
 
             <label className="flex flex-col gap-1.5 text-sm">
-              <span className="font-medium text-slate-700">회사/브랜드명 (선택)</span>
+              <span className="font-medium text-slate-700">{t("companyName")}</span>
               <input
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
@@ -166,7 +174,7 @@ export default function DiagnosePage() {
             </label>
 
             <label className="flex flex-col gap-1.5 text-sm">
-              <span className="font-medium text-slate-700">역할 (선택)</span>
+              <span className="font-medium text-slate-700">{t("role")}</span>
               <input
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
@@ -180,7 +188,7 @@ export default function DiagnosePage() {
                 checked={marketingConsent}
                 onChange={(e) => setMarketingConsent(e.target.checked)}
               />
-              마케팅 정보 수신에 동의합니다 (선택)
+              {t("marketingConsent")}
             </label>
           </>
         )}
@@ -192,7 +200,7 @@ export default function DiagnosePage() {
           disabled={!canSubmit}
           className="rounded-full bg-slate-900 py-4 text-sm font-semibold text-white disabled:opacity-40"
         >
-          {submitting ? "시작하는 중..." : "다음: 문항 시작하기"}
+          {submitting ? t("submitting") : t("submit")}
         </button>
       </form>
     </main>

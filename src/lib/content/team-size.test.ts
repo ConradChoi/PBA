@@ -1,20 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { formatTeamSize, TEAM_SIZE_BANDS } from "./team-size";
+import { TEAM_SIZE_VALUES } from "./team-size";
+import ko from "@/i18n/messages/ko";
 
-describe("formatTeamSize", () => {
-  it("labels a band code", () => {
-    expect(formatTeamSize("6_20")).toBe("6~20명");
-  });
-
-  it("shows legacy free text as it was entered", () => {
-    expect(formatTeamSize("대표 포함 4명")).toBe("대표 포함 4명");
-  });
-
-  it("falls back to a dash when nothing was entered", () => {
-    expect(formatTeamSize(null)).toBe("-");
-  });
-
+describe("TEAM_SIZE_VALUES", () => {
   it("offers six bands", () => {
-    expect(TEAM_SIZE_BANDS).toHaveLength(6);
+    expect(TEAM_SIZE_VALUES).toHaveLength(6);
+  });
+
+  it("has a label in the ko messages for every code", () => {
+    for (const band of TEAM_SIZE_VALUES) {
+      expect(ko.basicInfo.teamSizes[band].length).toBeGreaterThan(0);
+    }
   });
 });

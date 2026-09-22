@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAssessmentById } from "@/lib/assessments/get-assessment";
 import { formatBusinessStage } from "@/lib/content/business-stage";
-import { formatTeamSize } from "@/lib/content/team-size";
+import ko from "@/i18n/messages/ko";
 import { growthBandLabel, revenueBandLabel } from "@/lib/assessments/outcome.schema";
 import { RetentionCard } from "@/components/admin/RetentionCard";
 import { ResultReport } from "@/components/diagnose/ResultReport";
@@ -20,14 +20,29 @@ export default async function AssessmentDetailPage({
     notFound();
   }
 
+  // team_size holds a known code from the wizard, or legacy free text typed
+  // before the code list existed — show the label when we have one, else the
+  // raw value as-is.
+  const teamSizeLabel = assessment.team_size
+    ? ((ko.basicInfo.teamSizes as Record<string, string>)[assessment.team_size] ??
+      assessment.team_size)
+    : "-";
+
   const fields: [string, string][] = [
     ["이름", assessment.name ?? "익명"],
     ["이메일", assessment.email ?? "-"],
     ["회사/브랜드명", assessment.company_name ?? "-"],
     ["역할", assessment.role ?? "-"],
-    ["사업 단계", formatBusinessStage(assessment.business_stage, assessment.business_stage_other)],
+    [
+      "사업 단계",
+      formatBusinessStage(
+        ko.basicInfo.stages[assessment.business_stage],
+        assessment.business_stage_other,
+        assessment.business_stage
+      ),
+    ],
     ["업종", assessment.industry ?? "-"],
-    ["팀 규모", formatTeamSize(assessment.team_size)],
+    ["팀 규모", teamSizeLabel],
     ["총점", `${assessment.total_raw} / 140`],
     ["Architecture Level", assessment.architecture_level],
     [

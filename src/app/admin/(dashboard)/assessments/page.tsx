@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listAssessments } from "@/lib/assessments/get-assessment";
 import { formatBusinessStage } from "@/lib/content/business-stage";
+import ko from "@/i18n/messages/ko";
 
 export default async function AssessmentsPage() {
   const assessments = await listAssessments();
@@ -33,7 +34,11 @@ export default async function AssessmentsPage() {
                 <td className="px-4 py-3.5">{a.name ?? "익명"}</td>
                 <td className="px-4 py-3.5">{a.email ?? "-"}</td>
                 <td className="px-4 py-3.5">
-                  {formatBusinessStage(a.business_stage, a.business_stage_other)}
+                  {formatBusinessStage(
+                    ko.basicInfo.stages[a.business_stage],
+                    a.business_stage_other,
+                    a.business_stage
+                  )}
                 </td>
                 <td className="px-4 py-3.5 font-semibold text-indigo-600">
                   {a.architecture_level}

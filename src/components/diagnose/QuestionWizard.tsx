@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { trackEvent } from "@/lib/analytics/ga4";
 import { LAYERS } from "@/lib/scoring/layers.config";
-import { QUESTIONS } from "@/lib/content/questions";
-import { LAYER_DESCRIPTIONS } from "@/lib/content/layer-descriptions";
 import type { LayerAnswerSet } from "@/lib/types/assessment";
 
 export function QuestionWizard({
@@ -16,12 +15,13 @@ export function QuestionWizard({
   initialStep: number;
 }) {
   const router = useRouter();
+  const t = useTranslations("wizard");
   const [stepIndex, setStepIndex] = useState(initialStep);
   const [answers, setAnswers] = useState<(number | null)[]>([null, null, null, null]);
   const [submitting, setSubmitting] = useState(false);
 
   const layer = LAYERS[stepIndex];
-  const questions = QUESTIONS[layer.id];
+  const questions = t.raw(`questions.${layer.id}`) as [string, string, string, string];
   const allAnswered = answers.every((a) => a !== null);
 
   function selectAnswer(questionIndex: number, value: number) {
@@ -90,7 +90,7 @@ export function QuestionWizard({
 
       <div className="flex flex-col gap-1.5">
         <h1 className="text-2xl font-bold">{layer.name}</h1>
-        <p className="text-sm text-slate-500">{LAYER_DESCRIPTIONS[layer.id]}</p>
+        <p className="text-sm text-slate-500">{t(`layerDescriptions.${layer.id}`)}</p>
       </div>
 
       <div className="flex flex-col gap-8">
@@ -116,8 +116,8 @@ export function QuestionWizard({
               ))}
             </div>
             <div className="flex justify-between text-[10px] text-slate-400">
-              <span>전혀 정리되지 않음</span>
-              <span>명확하게 정의되고 데이터로 관리됨</span>
+              <span>{t("scaleLow")}</span>
+              <span>{t("scaleHigh")}</span>
             </div>
           </div>
         ))}
@@ -129,7 +129,7 @@ export function QuestionWizard({
         disabled={!allAnswered || submitting}
         className="rounded-full bg-slate-900 py-4 text-sm font-semibold text-white disabled:opacity-40"
       >
-        {stepIndex === LAYERS.length - 1 ? "결과 보기" : "다음"}
+        {stepIndex === LAYERS.length - 1 ? t("finish") : t("next")}
       </button>
     </main>
   );

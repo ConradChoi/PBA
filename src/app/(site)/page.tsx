@@ -1,29 +1,29 @@
+import { getTranslations } from "next-intl/server";
 import { TrackPageView } from "@/components/TrackPageView";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const t = await getTranslations("landing");
+  const tCommon = await getTranslations("common");
+
   return (
     <main className="mx-auto flex w-full flex-1 max-w-3xl flex-col items-center justify-center gap-6 px-4 text-center">
       <TrackPageView event="radar_landing_view" />
       <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
-        PBA 7-Layer Business Radar
+        {tCommon("brand")}
       </p>
-      <h1 className="text-3xl font-bold sm:text-4xl">
-        사업이 막힐 때, 기능보다 구조부터 봅니다.
-      </h1>
-      <p className="text-lg text-slate-600">
-        5분이면 현재 사업의 구조적 병목을 확인할 수 있습니다.
-      </p>
+      <h1 className="text-3xl font-bold sm:text-4xl">{t("headline")}</h1>
+      <p className="text-lg text-slate-600">{t("subhead")}</p>
       <a
         href="/diagnose"
         className="rounded-full bg-slate-900 px-6 py-3 text-white transition hover:bg-slate-700"
       >
-        무료 Business Radar 시작하기
+        {t("cta")}
       </a>
       <ul className="flex flex-wrap justify-center gap-4 text-sm text-slate-500">
-        <li>28문항</li>
-        <li>약 5분</li>
-        <li>7개 구조 영역</li>
-        <li>결과 즉시 확인</li>
+        <li>{t("stats.questionCount")}</li>
+        <li>{t("stats.duration")}</li>
+        <li>{t("stats.layerCount")}</li>
+        <li>{t("stats.instantResult")}</li>
       </ul>
     </main>
   );

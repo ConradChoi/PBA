@@ -6,6 +6,7 @@ import {
 } from "@/lib/consulting/get-consulting-requests";
 import { getAssessmentById } from "@/lib/assessments/get-assessment";
 import { formatBusinessStage } from "@/lib/content/business-stage";
+import ko from "@/i18n/messages/ko";
 
 export default async function ConsultingRequestDetailPage({
   params,
@@ -65,7 +66,11 @@ export default async function ConsultingRequestDetailPage({
             <div>
               <p className="text-xs text-slate-500">사업 단계</p>
               <p className="font-medium">
-                {formatBusinessStage(assessment.business_stage, assessment.business_stage_other)}
+                {formatBusinessStage(
+                  ko.basicInfo.stages[assessment.business_stage],
+                  assessment.business_stage_other,
+                  assessment.business_stage
+                )}
               </p>
             </div>
             <div>
