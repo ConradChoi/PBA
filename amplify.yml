@@ -11,6 +11,16 @@ frontend:
         # .env.production so SSR pages and API routes can read them.
         - env | grep -e '^NEXT_PUBLIC_' -e '^SUPABASE_SERVICE_ROLE_KEY=' >> .env.production
         - npm run build
+        # Regression gate for the incident fixed in ed486cc (admin data
+        # leaking into the body of a 307 for unauthenticated requests — see
+        # scripts/check-admin-no-leak.mjs for the full story). This project
+        # has no separate CI; Amplify's build phase is what stands between a
+        # commit and a deploy, so this is where that gate has to live. It
+        # starts the build just produced, hits every admin route with no
+        # auth cookie, and fails the build (blocking the deploy) if any
+        # response body contains customer data. Read-only against Supabase;
+        # it never seeds or deletes rows here.
+        - npm run test:security
   artifacts:
     baseDirectory: .next
     files:

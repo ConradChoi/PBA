@@ -18,6 +18,16 @@ const nextConfig: NextConfig = {
           { key: "Vary", value: "Accept-Language, Cookie, CloudFront-Viewer-Country" },
         ],
       },
+      {
+        // Keep the operator dashboard out of search engines. Belt-and-braces
+        // with robots.ts's Disallow rule: a crawler that ignores robots.txt
+        // (or reaches an admin URL via a stray link) still gets told via
+        // this header not to index whatever it fetched. Same matcher as
+        // src/middleware.ts's config.matcher, so this stays in lockstep with
+        // what actually requires auth.
+        source: "/admin/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
     ];
   },
 };

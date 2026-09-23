@@ -40,3 +40,17 @@ customHeaders:
     headers:
       - key: 'Vary'
         value: 'Accept-Language, Cookie, CloudFront-Viewer-Country'
+
+  # Keep the operator dashboard out of search engines, at the CDN layer.
+  # next.config.ts sets the same header from the app itself (unaffected by
+  # the Next.js Vary bug above, since this one isn't a Vary header) — this
+  # entry covers anything the CDN might serve from cache before the app's
+  # own header would apply.
+  - pattern: '/admin'
+    headers:
+      - key: 'X-Robots-Tag'
+        value: 'noindex, nofollow'
+  - pattern: '/admin/**'
+    headers:
+      - key: 'X-Robots-Tag'
+        value: 'noindex, nofollow'
