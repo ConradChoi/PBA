@@ -2,8 +2,13 @@ import Link from "next/link";
 import { listConsultingRequests } from "@/lib/consulting/get-consulting-requests";
 import { getAssessmentsByIds } from "@/lib/assessments/get-assessment";
 import { formatLocaleLabel } from "@/lib/content/format-locale";
+import { requireOperator } from "@/lib/operators/require-operator";
 
 export default async function ConsultingRequestsPage() {
+  // Verify the operator before reading anything: a layout redirect alone
+  // still lets this page's data reach the response body.
+  await requireOperator();
+
   const requests = await listConsultingRequests();
   const assessments = await getAssessmentsByIds(requests.map((r) => r.assessment_id));
   const assessmentById = new Map(assessments.map((a) => [a.id, a]));

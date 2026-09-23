@@ -7,6 +7,7 @@ import ko from "@/i18n/messages/ko";
 import { RetentionCard } from "@/components/admin/RetentionCard";
 import { ResultReport } from "@/components/diagnose/ResultReport";
 import { ResultPreviewButton } from "@/components/admin/ResultPreviewButton";
+import { requireOperator } from "@/lib/operators/require-operator";
 
 export default async function AssessmentDetailPage({
   params,
@@ -14,6 +15,10 @@ export default async function AssessmentDetailPage({
   params: Promise<{ assessmentId: string }>;
 }) {
   const { assessmentId } = await params;
+  // Verify the operator before reading anything: a layout redirect alone
+  // still lets this page's data reach the response body.
+  await requireOperator();
+
   const assessment = await getAssessmentById(assessmentId);
 
   if (!assessment) {

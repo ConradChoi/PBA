@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getNoticeById } from "@/lib/notices/get-notices";
 import { NoticeForm } from "@/components/admin/NoticeForm";
+import { requireOperator } from "@/lib/operators/require-operator";
 
 export default async function EditNoticePage({
   params,
@@ -9,6 +10,10 @@ export default async function EditNoticePage({
   params: Promise<{ noticeId: string }>;
 }) {
   const { noticeId } = await params;
+  // Verify the operator before reading anything: a layout redirect alone
+  // still lets this page's data reach the response body.
+  await requireOperator();
+
   const notice = await getNoticeById(noticeId);
 
   if (!notice) {

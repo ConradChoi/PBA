@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { listNotices } from "@/lib/notices/get-notices";
+import { requireOperator } from "@/lib/operators/require-operator";
 
 export default async function AdminNoticesPage() {
+  // Verify the operator before reading anything: a layout redirect alone
+  // still lets this page's data reach the response body.
+  await requireOperator();
+
   const notices = await listNotices();
 
   return (
