@@ -6,6 +6,16 @@ frontend:
         - npm ci --cache .npm --prefer-offline
     build:
       commands:
+        # Unit test gate. This project has no separate CI, so this is the
+        # only place the Vitest suite runs before a deploy -- including
+        # src/middleware.guard.test.ts (guard 2 in the incident record,
+        # docs/security/2026-09-23-admin-exposure-incident.md:§8),
+        # ko.test.ts (admin-only content never lands in a public message
+        # namespace) and ResultReport.test.tsx (internal hypotheses never
+        # reach the public view). Runs first, before the build it doesn't
+        # depend on: it's cheap (~2s for the whole suite) and fails fast
+        # instead of burning a full `next build` on a broken guard.
+        - npm test
         # Amplify console env vars exist only during the build, not in the
         # Next.js server runtime. Write the ones the server needs into
         # .env.production so SSR pages and API routes can read them.
