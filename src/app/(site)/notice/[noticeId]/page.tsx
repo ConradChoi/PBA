@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getPublishedNoticeById } from "@/lib/notices/get-notices";
+import { formatDate } from "@/lib/content/format-date";
 
 export default async function NoticeDetailPage({
   params,
@@ -16,6 +17,7 @@ export default async function NoticeDetailPage({
   }
 
   const t = await getTranslations("common");
+  const locale = await getLocale();
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
@@ -25,7 +27,7 @@ export default async function NoticeDetailPage({
         </Link>
         <h1 className="text-2xl font-bold">{notice.title}</h1>
         <p className="text-xs text-slate-400">
-          {notice.published_at ? new Date(notice.published_at).toLocaleDateString("ko-KR") : ""}
+          {notice.published_at ? formatDate(notice.published_at, locale) : ""}
         </p>
       </div>
 

@@ -7,6 +7,7 @@ import { LAYER_IDS } from "@/lib/types/assessment";
 import { maturityLevel, type MaturityLevel } from "@/lib/scoring/maturity";
 import { evaluateRiskSignals } from "@/lib/scoring/risk-signals";
 import { subjectParticle } from "@/lib/content/korean-particle";
+import { formatDate } from "@/lib/content/format-date";
 import { LAYERS } from "@/lib/scoring/layers.config";
 import type { Locale } from "@/i18n/locales";
 
@@ -86,7 +87,9 @@ export async function ResultReport({
         </p>
         <p className="text-sm text-slate-500">
           {assessment.name ?? t("anonymousLabel")} ·{" "}
-          {new Date(assessment.created_at).toLocaleDateString("ko-KR")}
+          {/* The `locale` prop, not a fresh getLocale(): the admin preview
+              forces "ko" and its date must stay Korean-formatted too. */}
+          {formatDate(assessment.created_at, locale)}
         </p>
       </header>
 

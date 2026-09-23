@@ -34,7 +34,7 @@ const en = {
     },
   },
   landing: {
-    headline: "When a business stalls, look at the structure before the features.",
+    headline: "When a business stalls, we look at structure before features.",
     subhead:
       "In five minutes you can see where your business is structurally blocked.",
     cta: "Start the free Business Radar",
@@ -144,7 +144,7 @@ const en = {
         "Do you know how customers first discover you?",
         "Is the path from interest → purchase → use → repurchase designed?",
         "Do you know the main points where customers drop off?",
-        "Is the customer experience free from depending too heavily on the individual handling it?",
+        "Is the customer experience consistent, rather than depending on whoever handles it?",
       ],
       process: [
         "Can you describe the whole process from a customer request to the work being finished?",
@@ -159,7 +159,7 @@ const en = {
         "Are the specific points where AI or automation could be applied defined?",
       ],
       scale: [
-        "When revenue grows, do the owner's working hours stay flat instead of growing at the same rate?",
+        "When revenue grows, do the owner's working hours grow more slowly than revenue?",
         "Do work standards and an operations manual exist?",
         "Is there recurring revenue, or a subscription or licensing structure?",
         "Can someone else deliver the service at the same quality?",
@@ -175,7 +175,7 @@ const en = {
     hypothesisHeading: "Most likely cause hypothesis",
     // {layer} arrives as the bare layer name for every locale but `ko`, so
     // the sentence has to read correctly with it substituted as-is.
-    hypothesisIntro: "The most common cause of a low {layer} score is the following.",
+    hypothesisIntro: "The most common reason {layer} scores low is this:",
     hypothesisOutro:
       "In a consultation we go through your process and data together to check whether this hypothesis is the actual cause.",
     strengthHeading: "Strength Top 2",
@@ -185,7 +185,7 @@ const en = {
       p2: "Days 31–60",
       p3: "Days 61–90",
     },
-    consultingCta: "Book a consultation to test this hypothesis",
+    consultingCta: "Request a consultation to test this hypothesis",
     printButton: "Save as PDF · Print",
     backHome: "Back to home",
     printFooter: "PBA 7-Layer Business Radar · pba.ylia.io · YLIA Co., Ltd.",
@@ -388,7 +388,7 @@ const en = {
         "100m_1b": "₩100M–1B",
         "1b_5b": "₩1B–5B",
         "5b_10b": "₩5B–10B",
-        gte_10b: "Over ₩10B",
+        gte_10b: "₩10B or more",
       },
       growthBands: {
         decline: "Declining",
@@ -447,7 +447,7 @@ const en = {
         "The Company processes personal information for the purposes below, and will obtain consent in advance if those purposes change.",
       items: [
         "Sending the diagnostic result report (PDF) by email",
-        "Receiving requests for consulting based on diagnostic results, and providing information and contacting you about them",
+        "Receiving requests for a consultation (consulting) based on diagnostic results, and providing guidance and contact",
         "Providing marketing information (with separate consent): newsletter and insight emails, seminar and program announcements, announcements of new services and events",
         "Statistical analysis and improvement of service usage (on the basis of information that does not identify individuals)",
         "Research on and improvement of the diagnostic methodology (limited to information processed into a form in which individuals cannot be identified)",

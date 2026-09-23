@@ -139,3 +139,30 @@ describe("ResultReport privacy invariant", () => {
     }
   });
 });
+
+// The header date used to be hardcoded to "ko-KR", so an English visitor saw
+// "2026. 9. 1.". It now follows the `locale` prop -- which also means the
+// admin preview, which forces locale="ko", keeps the Korean format whatever
+// language the operator's browser asks for.
+describe("ResultReport header date", () => {
+  const createdAt = new Date(assessment.created_at);
+
+  it("formats the date in Korean for ko", async () => {
+    const html = await renderResultReport({ assessment, locale: "ko" });
+
+    expect(html).toContain(createdAt.toLocaleDateString("ko-KR"));
+  });
+
+  it("keeps the Korean format in the admin preview, which forces ko", async () => {
+    const html = await renderResultReport({ assessment, audience: "admin", locale: "ko" });
+
+    expect(html).toContain(createdAt.toLocaleDateString("ko-KR"));
+  });
+
+  it("formats the date in English for en", async () => {
+    const html = await renderResultReport({ assessment, locale: "en" });
+
+    expect(html).toContain(createdAt.toLocaleDateString("en"));
+    expect(html).not.toContain(createdAt.toLocaleDateString("ko-KR"));
+  });
+});
