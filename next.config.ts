@@ -7,6 +7,17 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    // Splitting the root layout into (site)/layout.tsx and admin/layout.tsx
+    // (so each can render <html lang> for its own audience) left no layout
+    // at all for a URL that matches no route -- Next's built-in fallback
+    // then serves a bare, unbranded 404 with no `lang`, no chrome, no
+    // analytics. This flag turns on the `global-not-found.tsx` file
+    // convention (see src/app/global-not-found.tsx), the supported way to
+    // give that genuinely-unmatched-route case a real page when there are
+    // multiple root layouts and no single one to fall back to.
+    globalNotFound: true,
+  },
   async headers() {
     return [
       {

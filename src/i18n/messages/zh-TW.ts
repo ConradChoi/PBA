@@ -33,6 +33,11 @@ const zhTW = {
         title: "找不到這則公告",
         cta: "回到公告列表",
       },
+      global: {
+        title: "找不到頁面",
+        description: "您造訪的頁面不存在，或網址可能已經變更。",
+        cta: "回到首頁",
+      },
     },
   },
   landing: {

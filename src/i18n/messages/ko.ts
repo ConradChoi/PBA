@@ -30,6 +30,14 @@ const ko = {
         title: "공지를 찾을 수 없습니다",
         cta: "공지사항 목록으로",
       },
+      // The app-wide 404 (no matching route at all), rendered by
+      // (site)/not-found.tsx so it still gets the site chrome, `lang` and
+      // analytics instead of Next's bare framework default.
+      global: {
+        title: "페이지를 찾을 수 없습니다",
+        description: "요청하신 페이지가 존재하지 않거나 주소가 변경되었을 수 있습니다.",
+        cta: "홈으로 돌아가기",
+      },
     },
   },
   landing: {

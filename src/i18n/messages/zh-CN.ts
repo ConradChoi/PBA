@@ -31,6 +31,11 @@ const zhCN = {
         title: "找不到该公告",
         cta: "返回公告列表",
       },
+      global: {
+        title: "找不到页面",
+        description: "您访问的页面不存在，或者网址已经变更。",
+        cta: "返回首页",
+      },
     },
   },
   landing: {

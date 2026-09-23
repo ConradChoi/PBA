@@ -31,6 +31,11 @@ const en = {
         title: "We could not find that notice",
         cta: "Back to notices",
       },
+      global: {
+        title: "Page not found",
+        description: "The page you requested doesn't exist, or its address may have changed.",
+        cta: "Back to home",
+      },
     },
   },
   landing: {
