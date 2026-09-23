@@ -551,6 +551,15 @@ const ko = {
   },
 } as const;
 
-export type Messages = typeof ko;
+// `as const` is what makes the key set exact (and keeps array shapes fixed),
+// but it also gives every value a string *literal* type -- so a plain
+// `typeof ko` would demand that every other locale repeat the Korean text
+// verbatim. Widening each leaf back to `string` keeps the structure (which is
+// what a locale file has to match) without pinning the content.
+type Widen<T> = T extends string
+  ? string
+  : { readonly [K in keyof T]: Widen<T[K]> };
+
+export type Messages = Widen<typeof ko>;
 
 export default ko;
