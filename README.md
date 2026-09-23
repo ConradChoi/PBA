@@ -13,16 +13,18 @@ mix code, data, or branding between the two.
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY` (server-only — never commit this or expose
      it to the client)
-3. Apply every file in `supabase/migrations/` (0001-0011) in order, in the
+3. Apply every file in `supabase/migrations/` (0001-0012) in order, in the
    Supabase SQL Editor. They define `assessments`, `assessment_drafts`,
    `consulting_requests`, `notices`, RLS policies, the `reports` and
-   `notice-images` storage buckets, and a
+   `notice-images` storage buckets, a
    daily pg_cron job (03:00 KST) that enforces the privacy policy's retention
    periods: personal fields on diagnoses (name, email, company, role, industry
    and UTM) and consulting requests are removed after 1 year, unfinished drafts
-   after 30 days. Rows an operator has put on a retention hold are skipped
-   until the hold expires. Statistics should read the `assessments_research`
-   view, which excludes name, email, company and role.
+   after 30 days (rows an operator has put on a retention hold are skipped
+   until the hold expires; statistics should read the `assessments_research`
+   view, which excludes name, email, company and role), and a `locale` column
+   on `assessments`/`assessment_drafts` recording which language the diagnosis
+   was taken in (see "Multi-language support" below).
 4. (Optional) Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` to your GA4 web stream's
    measurement ID (Google Analytics → Admin → Data Streams → your stream).
    Without it, no GA4 script loads.
@@ -117,16 +119,56 @@ await supabase.auth.admin.createUser({
 });
 ```
 
+## Multi-language support
+
+The public site (everything under `(site)`, i.e. `/`, `/diagnose`, result and
+consult pages, `/notice`, `/privacy`) renders in five locales: `ko`, `en`,
+`zh-CN`, `zh-TW`, `ja`. There are no locale-specific URLs — the same path
+renders in whichever language the request resolves to.
+
+Locale resolution (`src/i18n/locales.ts`, `resolveLocale`), in priority
+order:
+
+1. The `NEXT_LOCALE` cookie, set by the header language switcher.
+2. The `Accept-Language` header, honoring `q` weights.
+3. The `CloudFront-Viewer-Country` header (Amplify sits behind CloudFront),
+   mapped to a locale.
+4. `ko` — the default, which also keeps search crawlers (no
+   `Accept-Language` at all) indexed in Korean.
+
+All copy lives in `src/i18n/messages/*.ts`. `ko.ts` is the source of truth;
+`en.ts`, `zh-CN.ts`, `zh-TW.ts` and `ja.ts` each `satisfies Messages`
+(a type derived from `ko.ts`), so a key added to `ko.ts` without a matching
+translation fails the typecheck instead of silently falling back at runtime.
+
+`/admin` has its own root layout that always renders `<html lang="ko">` and
+is never affected by the visitor's cookie, browser language or country —
+operators work in Korean regardless of who they're looking at. The
+admin's "고객 결과 화면 보기" preview popup renders the same public
+`ResultReport` component with `locale="ko"` forced, so an assessment taken
+in another language still previews in Korean for the operator, while the
+customer-facing page for that same assessment still follows the visitor's
+own resolved locale.
+
+`assessments.locale` and `assessment_drafts.locale` (migration 0012) record
+which language the diagnosis was actually taken in, stamped once when the
+draft is created and copied through to completion — not re-resolved, so a
+mid-flow language change doesn't retroactively relabel an in-progress
+diagnosis. The admin's assessment list and detail page show it via
+`formatLocaleLabel` (`src/lib/content/format-locale.ts`), e.g. a diagnosis
+taken in Japanese shows as "日本語 (ja)".
+
 ## Scope of this codebase so far
 
 Implemented: project scaffold, Supabase client wiring, the scoring/level/
-bottleneck engine, the `assessments` write path, GA4 setup, and the full
+bottleneck engine, the `assessments` write path, GA4 setup, the full
 `/diagnose` flow (basic info → 7-layer question wizard, resumable via
 server-persisted drafts → result page with Radar chart, summary,
 per-layer maturity, risk signals, a cause hypothesis, bottleneck/strength
 cards, and a 90-day priority timeline), the consulting
 request flow (`/diagnose/result/[assessmentId]/consult`), the notice board
-(`/notice`), and the admin panel described above.
+(`/notice`), the admin panel described above, and multi-language support
+(see above).
 
 **Not yet implemented** (future plans): Phase 2 (server-side PDF and Resend
-email delivery) and multi-language support.
+email delivery).
