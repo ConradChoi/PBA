@@ -78,7 +78,7 @@ const en = {
       "2_5": "2–5 people",
       "6_20": "6–20 people",
       "21_50": "21–50 people",
-      "51_200": "51–200 people",
+      "51_200": "51–199 people",
       gt_200: "200+ people",
     },
     consent: {
