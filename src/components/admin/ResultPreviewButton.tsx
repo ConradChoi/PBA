@@ -3,8 +3,13 @@
 import { useState } from "react";
 import { Modal } from "./Modal";
 
-// `children` is the server-rendered ResultReport, so the popup shows exactly
-// what the customer sees without leaving the admin panel.
+// `children` is the server-rendered ResultReport, always called with
+// locale="ko" (see assessments/[assessmentId]/page.tsx) because the admin
+// stays Korean regardless of which locale the assessment itself was taken
+// in (assessments.locale). So this shows the Korean rendering of the
+// customer's result without leaving the admin panel -- exactly what the
+// customer saw only when their assessment was also ko; for any other
+// locale it is a Korean-language preview of the same data, by design.
 export function ResultPreviewButton({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
 
