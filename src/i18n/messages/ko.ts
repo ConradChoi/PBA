@@ -31,8 +31,11 @@ const ko = {
         cta: "공지사항 목록으로",
       },
       // The app-wide 404 (no matching route at all), rendered by
-      // (site)/not-found.tsx so it still gets the site chrome, `lang` and
-      // analytics instead of Next's bare framework default.
+      // src/app/global-not-found.tsx so it still gets the site chrome,
+      // `lang` and analytics instead of Next's bare framework default.
+      // (site)/not-found.tsx never fires for an unmatched URL — only
+      // global-not-found.tsx does, and only while next.config.ts keeps
+      // experimental.globalNotFound on. See global-not-found.guard.test.ts.
       global: {
         title: "페이지를 찾을 수 없습니다",
         description: "요청하신 페이지가 존재하지 않거나 주소가 변경되었을 수 있습니다.",
