@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listConsultingRequests } from "@/lib/consulting/get-consulting-requests";
 import { getAssessmentsByIds } from "@/lib/assessments/get-assessment";
+import { formatLocaleLabel } from "@/lib/content/format-locale";
 
 export default async function ConsultingRequestsPage() {
   const requests = await listConsultingRequests();
@@ -24,6 +25,7 @@ export default async function ConsultingRequestsPage() {
               <th className="px-4 py-3.5">이메일</th>
               <th className="px-4 py-3.5">메시지</th>
               <th className="px-4 py-3.5">진단 등급</th>
+              <th className="px-4 py-3.5">언어</th>
               <th className="px-4 py-3.5"></th>
             </tr>
           </thead>
@@ -45,6 +47,9 @@ export default async function ConsultingRequestsPage() {
                   <td className="max-w-xs truncate px-4 py-3.5">{r.message ?? "-"}</td>
                   <td className="px-4 py-3.5 font-semibold text-indigo-600">
                     {assessment?.architecture_level ?? "-"}
+                  </td>
+                  <td className="px-4 py-3.5">
+                    {assessment ? formatLocaleLabel(assessment.locale) : "-"}
                   </td>
                   <td className="px-4 py-3.5 text-right">
                     <Link

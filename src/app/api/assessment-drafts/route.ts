@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getLocale } from "next-intl/server";
 import { draftBasicInfoSchema } from "@/lib/scoring/submit-assessment.schema";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase/server";
 
@@ -11,6 +12,9 @@ export async function POST(request: Request) {
   }
 
   const { basicInfo, privacyConsent, marketingConsent, utm } = parsed.data;
+  // Recorded once, here, so operators answer consult requests in the
+  // language the diagnosis was actually taken in -- see submit-assessment.ts.
+  const locale = await getLocale();
 
   const supabase = createServiceRoleSupabaseClient();
   const { data, error } = await supabase
@@ -24,6 +28,7 @@ export async function POST(request: Request) {
       utm_source: utm?.source ?? null,
       utm_medium: utm?.medium ?? null,
       utm_campaign: utm?.campaign ?? null,
+      locale,
     })
     .select("id")
     .single();

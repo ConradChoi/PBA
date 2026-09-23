@@ -51,6 +51,7 @@ describe("POST /api/assessment-drafts/[draftId]/complete", () => {
         utm_source: null,
         utm_medium: null,
         utm_campaign: null,
+        locale: "ja",
       },
       error: null,
     });
@@ -76,6 +77,44 @@ describe("POST /api/assessment-drafts/[draftId]/complete", () => {
     );
     expect(del).toHaveBeenCalled();
     expect(deleteEq).toHaveBeenCalledWith("id", "draft-id");
+  });
+
+  it("carries the draft's locale onto the assessment without re-resolving it", async () => {
+    // Guards against re-deriving locale from the completion request's own
+    // headers -- a draft started in Japanese must stay Japanese even if the
+    // completion request looks different (e.g. Accept-Language changed).
+    maybeSingle.mockResolvedValueOnce({
+      data: {
+        basic_info: { name: "テスト", email: "test@example.com", businessStage: "idea" },
+        answers: fullAnswers(),
+        privacy_consent: true,
+        marketing_consent: false,
+        utm_source: null,
+        utm_medium: null,
+        utm_campaign: null,
+        locale: "ja",
+      },
+      error: null,
+    });
+    persistAssessment.mockResolvedValueOnce({
+      ok: true,
+      assessmentId: "assessment-id",
+      architectureLevel: "IDEA_STAGE",
+      totalRaw: 28,
+      bottlenecks: ["process", "customer", "value"],
+      strengths: ["scale", "data"],
+    });
+    const { POST } = await import("./route");
+
+    await POST(
+      new Request("http://localhost", {
+        method: "POST",
+        headers: { "Accept-Language": "en" },
+      }),
+      { params: Promise.resolve({ draftId: "draft-id" }) }
+    );
+
+    expect(persistAssessment).toHaveBeenCalledWith(expect.objectContaining({ locale: "ja" }));
   });
 
   it("returns 400 when fewer than 7 layers are present", async () => {

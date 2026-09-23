@@ -90,6 +90,7 @@ const assessment: AssessmentRow = {
   privacy_consent_at: "2026-09-01T00:00:00.000Z",
   privacy_notice_version: "v1",
   marketing_consent: false,
+  locale: "ko",
   result_fit: null,
   result_fit_at: null,
   revenue_band: null,

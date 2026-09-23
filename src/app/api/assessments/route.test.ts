@@ -9,6 +9,14 @@ vi.mock("@/lib/supabase/server", () => ({
   createServiceRoleSupabaseClient: () => ({ from }),
 }));
 
+// getLocale() relies on next-intl's request-scoped config, which isn't
+// available outside the Next.js RSC/route runtime -- see the note in
+// ResultReport.test.tsx for the same constraint.
+const getLocale = vi.fn(async () => "ko");
+vi.mock("next-intl/server", () => ({
+  getLocale: () => getLocale(),
+}));
+
 function validPayload() {
   return {
     basicInfo: {
@@ -35,6 +43,8 @@ beforeEach(() => {
   select.mockClear();
   insert.mockClear();
   from.mockClear();
+  getLocale.mockClear();
+  getLocale.mockImplementation(async () => "ko");
 });
 
 describe("POST /api/assessments", () => {
@@ -58,6 +68,20 @@ describe("POST /api/assessments", () => {
     expect(insert).toHaveBeenCalledWith(
       expect.objectContaining({ total_raw: 28, architecture_level: "IDEA_STAGE" })
     );
+  });
+
+  it("stamps the row with the request's resolved locale", async () => {
+    getLocale.mockImplementationOnce(async () => "ja");
+    single.mockResolvedValueOnce({ data: { id: "test-id" }, error: null });
+    const { POST } = await import("./route");
+
+    const request = new Request("http://localhost/api/assessments", {
+      method: "POST",
+      body: JSON.stringify(validPayload()),
+    });
+    await POST(request);
+
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({ locale: "ja" }));
   });
 
   it("returns 400 for an invalid payload without touching Supabase", async () => {

@@ -6,6 +6,7 @@ import {
 } from "@/lib/consulting/get-consulting-requests";
 import { getAssessmentById } from "@/lib/assessments/get-assessment";
 import { formatBusinessStage } from "@/lib/content/business-stage";
+import { formatLocaleLabel } from "@/lib/content/format-locale";
 import ko from "@/i18n/messages/ko";
 
 export default async function ConsultingRequestDetailPage({
@@ -76,6 +77,10 @@ export default async function ConsultingRequestDetailPage({
             <div>
               <p className="text-xs text-slate-500">점수</p>
               <p className="font-medium">{assessment.total_raw} / 140</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-500">언어</p>
+              <p className="font-medium">{formatLocaleLabel(assessment.locale)}</p>
             </div>
           </div>
           <Link

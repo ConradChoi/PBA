@@ -9,6 +9,14 @@ vi.mock("@/lib/supabase/server", () => ({
   createServiceRoleSupabaseClient: () => ({ from }),
 }));
 
+// getLocale() relies on next-intl's request-scoped config, which isn't
+// available outside the Next.js RSC/route runtime -- see the note in
+// ResultReport.test.tsx for the same constraint.
+const getLocale = vi.fn(async () => "ko");
+vi.mock("next-intl/server", () => ({
+  getLocale: () => getLocale(),
+}));
+
 function validPayload() {
   return {
     basicInfo: { name: "테스트", email: "test@example.com", businessStage: "idea" },
@@ -22,6 +30,8 @@ beforeEach(() => {
   select.mockClear();
   insert.mockClear();
   from.mockClear();
+  getLocale.mockClear();
+  getLocale.mockImplementation(async () => "ko");
 });
 
 describe("POST /api/assessment-drafts", () => {
@@ -42,6 +52,20 @@ describe("POST /api/assessment-drafts", () => {
     expect(insert).toHaveBeenCalledWith(
       expect.objectContaining({ current_step: 0, answers: {}, privacy_consent: true })
     );
+  });
+
+  it("stamps the draft with the request's resolved locale", async () => {
+    getLocale.mockImplementationOnce(async () => "ja");
+    single.mockResolvedValueOnce({ data: { id: "draft-id" }, error: null });
+    const { POST } = await import("./route");
+
+    const request = new Request("http://localhost/api/assessment-drafts", {
+      method: "POST",
+      body: JSON.stringify(validPayload()),
+    });
+    await POST(request);
+
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({ locale: "ja" }));
   });
 
   it("returns 400 for a payload missing privacyConsent", async () => {

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAssessmentById } from "@/lib/assessments/get-assessment";
 import { formatBusinessStage } from "@/lib/content/business-stage";
+import { formatLocaleLabel } from "@/lib/content/format-locale";
 import ko from "@/i18n/messages/ko";
 import { RetentionCard } from "@/components/admin/RetentionCard";
 import { ResultReport } from "@/components/diagnose/ResultReport";
@@ -60,6 +61,7 @@ export default async function AssessmentDetailPage({
     ],
     ["Strength", `${assessment.strength_1}, ${assessment.strength_2}`],
     ["상담 신청 여부", assessment.consulting_requested ? "예" : "아니오"],
+    ["언어", formatLocaleLabel(assessment.locale)],
     [
       "개인정보 동의",
       `${assessment.privacy_consent ? "동의" : "미동의"} (${assessment.privacy_notice_version})`,

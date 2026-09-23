@@ -24,6 +24,7 @@ function validInput(): SubmitAssessmentInput {
     },
     privacyConsent: true,
     marketingConsent: false,
+    locale: "ko",
   };
 }
 

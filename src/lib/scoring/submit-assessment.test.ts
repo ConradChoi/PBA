@@ -22,6 +22,7 @@ function allOnesInput(): SubmitAssessmentInput {
     },
     marketingConsent: false,
     privacyConsent: true,
+    locale: "ko",
   };
 }
 

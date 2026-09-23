@@ -69,4 +69,8 @@ export type AssessmentDraftRow = {
   utm_source: string | null;
   utm_medium: string | null;
   utm_campaign: string | null;
+  // Which language the diagnosis was started in -- carried onto the
+  // assessment as-is at completion, never re-resolved from the completion
+  // request's headers. See submit-assessment.ts's SubmitAssessmentInput.
+  locale: string;
 };

@@ -4,6 +4,7 @@ import type {
   LayerAnswers,
   LayerId,
 } from "../types/assessment";
+import type { Locale } from "../../i18n/locales";
 import { findBottlenecks, findStrengths } from "./bottleneck";
 import { classifyArchitectureLevel } from "./architecture-level";
 import { scoreAllLayers, totalRawScore } from "./scoring";
@@ -15,6 +16,10 @@ export type SubmitAssessmentInput = {
   privacyConsent: boolean;
   marketingConsent: boolean;
   utm?: { source?: string; medium?: string; campaign?: string };
+  // Which language the diagnosis was taken in -- resolved once (via
+  // getLocale() when the draft is created, or directly for the one-shot
+  // submit path) and carried through, never re-resolved on completion.
+  locale: Locale;
 };
 
 export type AssessmentInsertRow = {
@@ -56,6 +61,7 @@ export type AssessmentInsertRow = {
   privacy_consent_at: string | null;
   privacy_notice_version: string;
   marketing_consent: boolean;
+  locale: string;
 };
 
 export type AssessmentComputation = {
@@ -117,6 +123,7 @@ export function computeAssessmentResult(
     privacy_consent_at: input.privacyConsent ? new Date().toISOString() : null,
     privacy_notice_version: PRIVACY_NOTICE_VERSION,
     marketing_consent: input.marketingConsent,
+    locale: input.locale,
   };
 
   return { row, architectureLevel, totalRaw, bottlenecks, strengths };

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listAssessments } from "@/lib/assessments/get-assessment";
 import { formatBusinessStage } from "@/lib/content/business-stage";
+import { formatLocaleLabel } from "@/lib/content/format-locale";
 import ko from "@/i18n/messages/ko";
 
 export default async function AssessmentsPage() {
@@ -22,6 +23,7 @@ export default async function AssessmentsPage() {
               <th className="px-4 py-3.5">사업단계</th>
               <th className="px-4 py-3.5">진단 등급</th>
               <th className="px-4 py-3.5">점수</th>
+              <th className="px-4 py-3.5">언어</th>
               <th className="px-4 py-3.5"></th>
             </tr>
           </thead>
@@ -44,6 +46,7 @@ export default async function AssessmentsPage() {
                   {a.architecture_level}
                 </td>
                 <td className="px-4 py-3.5">{a.total_raw} / 140</td>
+                <td className="px-4 py-3.5">{formatLocaleLabel(a.locale)}</td>
                 <td className="px-4 py-3.5 text-right">
                   <Link href={`/admin/assessments/${a.id}`} className="font-semibold text-indigo-600">
                     보기 →
