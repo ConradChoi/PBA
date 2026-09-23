@@ -6,9 +6,11 @@ const STORAGE_KEY = "dismissed-notice-id";
 
 export function NoticeBannerDismiss({
   noticeId,
+  dismissLabel,
   children,
 }: {
   noticeId: string;
+  dismissLabel: string;
   children: React.ReactNode;
 }) {
   const [dismissed, setDismissed] = useState(false);
@@ -30,7 +32,7 @@ export function NoticeBannerDismiss({
       {children}
       <button
         type="button"
-        aria-label="공지 닫기"
+        aria-label={dismissLabel}
         onClick={() => {
           try {
             window.localStorage.setItem(STORAGE_KEY, noticeId);

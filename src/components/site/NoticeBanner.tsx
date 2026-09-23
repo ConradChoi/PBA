@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { listPublishedNotices } from "@/lib/notices/get-notices";
 import { selectBannerNotice } from "@/lib/notices/notice-view";
 import { NoticeBannerDismiss } from "./NoticeBannerDismiss";
@@ -15,6 +16,8 @@ export async function NoticeBanner() {
     return null;
   }
 
+  const t = await getTranslations("common");
+
   // Compare in KST: the banner should disappear the day after the operator's
   // chosen end date in their own timezone.
   const today = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -25,7 +28,7 @@ export async function NoticeBanner() {
   }
 
   return (
-    <NoticeBannerDismiss noticeId={notice.id}>
+    <NoticeBannerDismiss noticeId={notice.id} dismissLabel={t("noticeClose")}>
       <Link href={`/notice/${notice.id}`} className="text-sm font-medium text-amber-900">
         {notice.title}
       </Link>
