@@ -59,6 +59,7 @@ export default async function ConsultingRequestsPage() {
                   <td className="px-4 py-3.5 text-right">
                     <Link
                       href={`/admin/consulting-requests/${r.id}`}
+                      prefetch={false}
                       className="font-semibold text-indigo-600"
                     >
                       보기 →

@@ -41,7 +41,7 @@ describe("middleware location and matcher", () => {
     expect(fs.existsSync(middlewarePath)).toBe(true);
   });
 
-  it("exports a config.matcher that still covers /admin/:path*", async () => {
+  it("exports a config.matcher that still covers both halves of the admin panel", async () => {
     const middlewareModule = await import("./middleware");
     const config = (middlewareModule as { config?: { matcher?: unknown } }).config;
 
@@ -52,10 +52,23 @@ describe("middleware location and matcher", () => {
     ).toBe(true);
 
     const matcher = config!.matcher as string[];
+
     expect(
       matcher.includes("/admin/:path*"),
       `config.matcher must include "/admin/:path*" so the auth check runs on every admin route. ` +
         `Got: ${JSON.stringify(matcher)}`
+    ).toBe(true);
+
+    // Dropping this one costs no visible auth — the route handlers check for
+    // themselves — so it would go unnoticed. What it costs is the access log:
+    // every admin *write* lives under /api/admin, including the purge that
+    // destroys a person's personal data irreversibly. Without this pattern
+    // the log can say who looked and never who deleted, which is the 수행업무
+    // half of 「개인정보의 안전성 확보조치 기준」 제8조.
+    expect(
+      matcher.includes("/api/admin/:path*"),
+      `config.matcher must include "/api/admin/:path*" so admin writes are recorded in the ` +
+        `access log. Got: ${JSON.stringify(matcher)}`
     ).toBe(true);
   });
 

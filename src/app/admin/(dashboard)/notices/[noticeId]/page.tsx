@@ -23,7 +23,7 @@ export default async function EditNoticePage({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/admin/notices" className="text-sm text-slate-500">
+        <Link prefetch={false} href="/admin/notices" className="text-sm text-slate-500">
           ← 공지사항 목록
         </Link>
         <h1 className="mt-2 text-2xl font-bold">공지 수정</h1>

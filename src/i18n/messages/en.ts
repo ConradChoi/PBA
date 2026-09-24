@@ -578,6 +578,7 @@ const en = {
         "Database access control (row-level security policies) and management of server-only authentication keys",
         "Encryption in transit (HTTPS)",
         "Invalidating existing login sessions when an operator changes their password",
+        "Retaining access records for the operator-facing system that handles personal information — the account used, the time of access, the source IP address, and the action performed — for at least one year, and reviewing them at least once a month",
       ],
     },
     section10: {

@@ -20,6 +20,7 @@ export default async function AdminNoticesPage() {
         </div>
         <Link
           href="/admin/notices/new"
+          prefetch={false}
           className="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white"
         >
           새 공지 작성
@@ -63,6 +64,7 @@ export default async function AdminNoticesPage() {
                 <td className="px-4 py-3.5 text-right">
                   <Link
                     href={`/admin/notices/${notice.id}`}
+                    prefetch={false}
                     className="font-semibold text-indigo-600"
                   >
                     수정 →

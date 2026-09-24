@@ -53,7 +53,11 @@ export default async function AssessmentsPage() {
                 <td className="px-4 py-3.5">{a.total_raw} / 140</td>
                 <td className="px-4 py-3.5">{formatLocaleLabel(a.locale)}</td>
                 <td className="px-4 py-3.5 text-right">
-                  <Link href={`/admin/assessments/${a.id}`} className="font-semibold text-indigo-600">
+                  <Link
+                    href={`/admin/assessments/${a.id}`}
+                    prefetch={false}
+                    className="font-semibold text-indigo-600"
+                  >
                     보기 →
                   </Link>
                 </td>

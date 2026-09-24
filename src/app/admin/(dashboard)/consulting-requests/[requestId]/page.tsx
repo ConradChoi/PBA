@@ -35,7 +35,7 @@ export default async function ConsultingRequestDetailPage({
   return (
     <div className="flex max-w-2xl flex-col gap-6">
       <div>
-        <Link href="/admin/consulting-requests" className="text-sm text-slate-500">
+        <Link prefetch={false} href="/admin/consulting-requests" className="text-sm text-slate-500">
           ← 상담 신청 목록
         </Link>
         <h1 className="mt-2 text-2xl font-bold">상담 신청 상세</h1>
@@ -90,6 +90,7 @@ export default async function ConsultingRequestDetailPage({
           </div>
           <Link
             href={`/admin/assessments/${assessment.id}`}
+            prefetch={false}
             className="w-fit text-sm font-semibold text-indigo-600"
           >
             전체 진단 결과 보기 →

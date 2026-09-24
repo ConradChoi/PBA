@@ -35,6 +35,7 @@ export default async function AdminDashboardLayout({
           <NotificationBell unreadCount={unreadCount} />
           <Link
             href="/admin/account"
+            prefetch={false}
             className="rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-medium text-slate-500"
           >
             내 계정

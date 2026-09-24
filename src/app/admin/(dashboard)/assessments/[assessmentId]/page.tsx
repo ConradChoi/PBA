@@ -87,7 +87,7 @@ export default async function AssessmentDetailPage({
   return (
     <div className="flex max-w-2xl flex-col gap-6">
       <div>
-        <Link href="/admin/assessments" className="text-sm text-slate-500">
+        <Link prefetch={false} href="/admin/assessments" className="text-sm text-slate-500">
           ← 전체 진단 목록
         </Link>
         <h1 className="mt-2 text-2xl font-bold">

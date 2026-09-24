@@ -216,7 +216,7 @@ async function cleanupSeed(supabase, seed) {
 }
 
 function buildRoutes(seed) {
-  const routes = ["/admin", "/admin/assessments", "/admin/consulting-requests", "/admin/notices", "/admin/operators", "/admin/account"];
+  const routes = ["/admin", "/admin/assessments", "/admin/consulting-requests", "/admin/notices", "/admin/operators", "/admin/access-logs", "/admin/account"];
 
   if (seed.assessmentId) {
     routes.push(`/admin/assessments/${seed.assessmentId}`);

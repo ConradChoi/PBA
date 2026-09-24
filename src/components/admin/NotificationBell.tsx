@@ -4,6 +4,7 @@ export function NotificationBell({ unreadCount }: { unreadCount: number }) {
   return (
     <Link
       href="/admin/consulting-requests"
+      prefetch={false}
       className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200"
       aria-label={`읽지 않은 상담 신청 ${unreadCount}건`}
     >
