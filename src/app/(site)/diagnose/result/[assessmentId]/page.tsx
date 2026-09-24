@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getAssessmentById } from "@/lib/assessments/get-assessment";
 import { TrackResultView } from "@/components/diagnose/TrackResultView";
-import { ConsultingCtaLink } from "@/components/diagnose/ConsultingCtaLink";
+import { SessionOffer } from "@/components/diagnose/SessionOffer";
 import { ResultReport } from "@/components/diagnose/ResultReport";
 import { PrintResultButton } from "@/components/diagnose/PrintResultButton";
 import { ResultFeedback } from "@/components/diagnose/ResultFeedback";
@@ -30,8 +30,11 @@ export default async function ResultPage({
 
       <ResultFeedback assessmentId={assessmentId} />
 
+      {/* 유료 세션 제안은 인쇄물에도 남는다. 아래 네비게이션 묶음만
+          print:hidden이고, 이 블록은 일부러 그 바깥에 둔다. */}
+      <SessionOffer assessmentId={assessmentId} />
+
       <section className="flex flex-col gap-3 print:hidden">
-        <ConsultingCtaLink assessmentId={assessmentId} />
         <PrintResultButton />
         <Link
           href="/"

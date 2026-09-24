@@ -188,7 +188,24 @@ const ja = {
       p2: "31〜60日",
       p3: "61〜90日",
     },
-    consultingCta: "原因仮説を検証する相談を申し込む",
+    // 金額は売上レンジと同じく ₩ 記号と数字で表記する（韓国語の「만원」を
+    // そのまま音写しない）。`body` と `includes.roadmap` の <b> は t.rich
+    // で描画する。
+    sessionOffer: {
+      heading: "次のステップ",
+      priceLine: "構造診断セッション · ₩390,000",
+      vatNote: "（税別）",
+      format: "オンライン2〜3時間 · ソウル首都圏は訪問も可能",
+      body: "この診断が見つけたボトルネックは、まだ<b>仮説</b>です。セッションでは実際の業務と数字を一緒に見ながら、それが本当の原因かどうかを確かめ、何から手をつけるべきかを整理します。",
+      includes: {
+        cause: "ボトルネック1〜2件を原因まで掘り下げる",
+        roadmap: "<b>90日実行ロードマップ資料</b> — セッション後3日以内にお渡し",
+        scope: "必要に応じて構築範囲と見積もりのご提案",
+      },
+      audience: "売上は立っているのに、代表が抜けると止まってしまう会社におすすめします。",
+      cta: "構造診断セッションを申し込む",
+      ctaNote: "お申し込み後、日程と支払い方法をメールでご案内します。",
+    },
     printButton: "結果PDFを保存・印刷",
     backHome: "ホームに戻る",
     printFooter: "PBA 7-Layer Business Radar · pba.ylia.io · YLIA Co., Ltd.",
@@ -405,12 +422,15 @@ const ja = {
   },
   consult: {
     backToResult: "← 診断結果に戻る",
-    title: "相談の申し込み",
+    title: "構造診断セッションの申し込み",
     // Same ICU `select` as ko: "yes" when assessment.name is set, "other"
     // for an anonymous diagnosis. Japanese uses 様 in the named branch,
     // which is the closest equivalent of the Korean 님.
     subtitle:
-      "{hasName, select, yes {{name}様の診断} other {診断}}結果をもとに、相談をお手伝いします。",
+      "{hasName, select, yes {{name}様の診断} other {診断}}結果をもとに、セッションを準備します。",
+    // 申し込みフォームの上に出す確認用ラベル。金額と形式の文言は
+    // result.sessionOffer だけに置き、この画面はそれを読み直す。
+    offerLabel: "お申し込み内容",
     anonymous: {
       name: "お名前 *",
       namePlaceholder: "山田太郎",
@@ -423,12 +443,13 @@ const ja = {
         "診断を始めるときに入力いただいたメールアドレスにご連絡します。",
     },
     message: "お伝えしたいこと（任意）",
-    submit: "相談を申し込む",
+    submit: "セッションを申し込む",
     submitting: "受け付けています...",
     error: "お申し込みを受け付けられませんでした。もう一度お試しください。",
     success: {
       title: "お申し込みを受け付けました",
-      description: "確認のうえ、{email} にご連絡します。",
+      // このフォームでは決済しないので、次に何が起きるかを明示する。
+      description: "{email} に日程と支払い方法をご案内します。",
       home: "最初に戻る",
       viewResult: "診断結果をもう一度見る",
     },

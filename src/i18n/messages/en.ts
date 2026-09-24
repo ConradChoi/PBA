@@ -190,7 +190,25 @@ const en = {
       p2: "Days 31–60",
       p3: "Days 61–90",
     },
-    consultingCta: "Request a consultation to test this hypothesis",
+    // The price is written out with the ₩ symbol, the same way the revenue
+    // bands above spell amounts, rather than transliterating the Korean
+    // "만원". <b> in `body` / `includes.roadmap` is rendered by t.rich.
+    sessionOffer: {
+      heading: "Next step",
+      priceLine: "Structure Diagnostic Session · ₩390,000",
+      vatNote: "(excl. VAT)",
+      format: "2–3 hours online · on-site available in the Seoul metropolitan area",
+      body: "The bottlenecks this diagnostic found are still <b>hypotheses</b>. In the session we go through your actual operations and numbers together, confirm whether that really is the cause, and settle what to fix first.",
+      includes: {
+        cause: "Trace one or two bottlenecks down to their root cause",
+        roadmap: "<b>A 90-day execution roadmap document</b> — delivered within 3 days of the session",
+        scope: "A build scope and quote, if you need one",
+      },
+      audience:
+        "Recommended for companies that are making money but stall the moment the founder steps away.",
+      cta: "Apply for a Structure Diagnostic Session",
+      ctaNote: "Once you apply, we will email you about scheduling and payment.",
+    },
     printButton: "Save as PDF · Print",
     backHome: "Back to home",
     printFooter: "PBA 7-Layer Business Radar · pba.ylia.io · YLIA Co., Ltd.",
@@ -407,12 +425,15 @@ const en = {
   },
   consult: {
     backToResult: "← Back to your results",
-    title: "Request a consultation",
+    title: "Apply for a Structure Diagnostic Session",
     // Same ICU `select` as ko: "yes" when assessment.name is set, "other"
     // for an anonymous diagnosis. English needs no honorific, only the
     // difference between a named and an unnamed diagnosis.
     subtitle:
-      "We will help you based on {hasName, select, yes {the diagnostic results for {name}} other {your diagnostic results}}.",
+      "We will build the session around {hasName, select, yes {the diagnostic results for {name}} other {your diagnostic results}}.",
+    // Label above the recap card. The price and format themselves live only
+    // in result.sessionOffer; this screen reads them back from there.
+    offerLabel: "What you are applying for",
     anonymous: {
       name: "Name *",
       namePlaceholder: "Jane Doe",
@@ -425,12 +446,13 @@ const en = {
         "We will contact you at the email you entered when you started the diagnostic.",
     },
     message: "Anything you would like to tell us (optional)",
-    submit: "Send the request",
+    submit: "Apply for the session",
     submitting: "Submitting...",
     error: "We could not submit your request. Please try again.",
     success: {
       title: "Your request has been received",
-      description: "We will review it and contact you at {email}.",
+      // No payment is taken in this form, so say what actually happens next.
+      description: "We will email {email} about scheduling and payment.",
       home: "Back to the start",
       viewResult: "View your results again",
     },

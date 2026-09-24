@@ -19,6 +19,10 @@ export default async function ConsultPage({
 
   const t = await getTranslations("consult");
   const tCommon = await getTranslations("common");
+  // 가격·형식 문구는 result.sessionOffer 하나만 두고 여기서도 그대로 읽는다.
+  // 같은 문장을 consult에 복사해 두면 5개 언어 중 한 곳만 가격이 바뀌는
+  // 사고가 나고, 그 사고의 비용은 "무료인 줄 알았다"는 신청자다.
+  const tOffer = await getTranslations("result");
 
   return (
     <main className="mx-auto flex max-w-md flex-col gap-6 px-4 py-10">
@@ -36,6 +40,18 @@ export default async function ConsultPage({
             name: assessment.name ?? "",
           })}
         </p>
+      </div>
+      <div className="flex flex-col gap-1 rounded-lg border border-slate-300 bg-slate-50 p-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          {t("offerLabel")}
+        </p>
+        <p className="text-sm font-bold text-slate-900">
+          {tOffer("sessionOffer.priceLine")}{" "}
+          <span className="text-xs font-medium text-slate-500">
+            {tOffer("sessionOffer.vatNote")}
+          </span>
+        </p>
+        <p className="text-xs text-slate-600">{tOffer("sessionOffer.format")}</p>
       </div>
       <ConsultForm
         assessmentId={assessmentId}

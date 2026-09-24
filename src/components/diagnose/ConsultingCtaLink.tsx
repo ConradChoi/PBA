@@ -13,7 +13,7 @@ export function ConsultingCtaLink({ assessmentId }: { assessmentId: string }) {
       onClick={() => trackEvent("radar_consulting_click")}
       className="block rounded-full bg-slate-900 py-4 text-center text-sm font-semibold text-white"
     >
-      {t("consultingCta")}
+      {t("sessionOffer.cta")}
     </Link>
   );
 }

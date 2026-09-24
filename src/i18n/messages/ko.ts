@@ -189,7 +189,26 @@ const ko = {
       p2: "31~60일",
       p3: "61~90일",
     },
-    consultingCta: "원인 가설 검증 상담받기",
+    // 결과 페이지 끝에 붙는 유료 세션 제안. 값이 걸린 문구라 폼에 도달하기
+    // 전에 가격이 먼저 보여야 하고, PDF에도 그대로 따라가야 한다.
+    // `body`와 `includes.roadmap`의 <b>는 t.rich로 렌더링한다 -- 강조가
+    // 문장 중간에 있어서 키를 쪼개면 모든 언어가 한국어 어순을 따라와야
+    // 하기 때문이다.
+    sessionOffer: {
+      heading: "다음 단계",
+      priceLine: "구조 진단 세션 · 39만원",
+      vatNote: "(VAT 별도)",
+      format: "온라인 2~3시간 · 수도권은 방문 가능",
+      body: "이 진단이 찾아낸 병목은 아직 <b>가설</b>입니다. 세션에서는 실제 업무와 숫자를 함께 보며 그게 진짜 원인인지 확인하고, 무엇부터 손대야 하는지 정리해 드립니다.",
+      includes: {
+        cause: "병목 1~2개를 원인까지 파고들기",
+        roadmap: "<b>90일 실행 로드맵 문서</b> — 세션 후 3일 내 전달",
+        scope: "필요한 경우 구축 범위와 견적 제안",
+      },
+      audience: "매출은 나오는데 대표가 빠지면 멈추는 회사에 권합니다.",
+      cta: "구조 진단 세션 신청하기",
+      ctaNote: "신청 후 일정과 결제 방법을 메일로 안내드립니다.",
+    },
     printButton: "결과 PDF 저장 · 인쇄",
     backHome: "홈으로 돌아가기",
     printFooter: "PBA 7-Layer Business Radar · pba.ylia.io · 주식회사 일리아",
@@ -387,12 +406,15 @@ const ko = {
   },
   consult: {
     backToResult: "← 진단 결과로 돌아가기",
-    title: "상담 신청",
+    title: "구조 진단 세션 신청",
     // hasName mirrors whether assessment.name is set: "yes" keeps the
     // Korean honorific phrasing ("{name}님의 진단"), "other" falls back to
     // the bare "진단" used for an anonymous diagnosis.
     subtitle:
-      "{hasName, select, yes {{name}님의 진단} other {진단}} 결과를 바탕으로 상담을 도와드리겠습니다.",
+      "{hasName, select, yes {{name}님의 진단} other {진단}} 결과를 바탕으로 세션을 준비하겠습니다.",
+    // 신청서 위에 붙는 확인용 라벨. 가격·형식 문구 자체는
+    // result.sessionOffer 하나만 두고 이 화면에서 다시 읽는다(중복 금지).
+    offerLabel: "신청하는 세션",
     anonymous: {
       name: "이름 *",
       namePlaceholder: "홍길동",
@@ -404,12 +426,14 @@ const ko = {
       notice: "진단을 시작할 때 입력하신 이메일로 연락드립니다.",
     },
     message: "전달하고 싶은 말 (선택)",
-    submit: "상담 신청하기",
+    submit: "세션 신청하기",
     submitting: "접수하는 중...",
     error: "신청을 접수하지 못했습니다. 다시 시도해주세요.",
     success: {
       title: "신청이 접수되었습니다",
-      description: "확인 후 {email}(으)로 연락드리겠습니다.",
+      // 결제는 이 폼에서 받지 않는다. 다음에 무슨 일이 일어나는지
+      // (일정 + 결제 방법 메일 안내)를 여기서 분명히 해 둔다.
+      description: "{email}(으)로 일정과 결제 방법을 안내드리겠습니다.",
       home: "처음으로",
       viewResult: "진단 결과 다시 보기",
     },

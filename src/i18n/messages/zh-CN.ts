@@ -184,7 +184,23 @@ const zhCN = {
       p2: "31~60 天",
       p3: "61~90 天",
     },
-    consultingCta: "申请咨询，验证原因假设",
+    // 金额与营收区间一样使用 ₩ 符号加数字，不音译韩语的「만원」。
+    // `body` 与 `includes.roadmap` 中的 <b> 由 t.rich 渲染。
+    sessionOffer: {
+      heading: "下一步",
+      priceLine: "结构诊断会谈 · ₩390,000",
+      vatNote: "（不含增值税）",
+      format: "线上 2~3 小时 · 首尔都市圈可上门",
+      body: "本次诊断找出的瓶颈目前仍是<b>假设</b>。会谈中我们会一起看实际的业务和数字，确认它是不是真正的原因，并理清应该先从哪里下手。",
+      includes: {
+        cause: "把 1~2 个瓶颈追查到根本原因",
+        roadmap: "<b>90 天执行路线图文件</b> — 会谈后 3 天内交付",
+        scope: "如有需要，提供落地范围与报价建议",
+      },
+      audience: "推荐给营收正常、但负责人一离开就停摆的公司。",
+      cta: "申请结构诊断会谈",
+      ctaNote: "申请之后，我们会通过邮件告知日程与付款方式。",
+    },
     printButton: "保存结果 PDF · 打印",
     backHome: "返回首页",
     printFooter: "PBA 7-Layer Business Radar · pba.ylia.io · YLIA Co., Ltd.",
@@ -387,12 +403,15 @@ const zhCN = {
   },
   consult: {
     backToResult: "← 返回诊断结果",
-    title: "申请咨询",
+    title: "申请结构诊断会谈",
     // Same ICU `select` as ko: "yes" when assessment.name is set, "other"
     // for an anonymous diagnosis. Chinese has no honorific, but the branch
     // still distinguishes a named diagnosis from an anonymous one.
     subtitle:
-      "我们会根据{hasName, select, yes {{name}的诊断} other {诊断}}结果为您提供咨询。",
+      "我们会根据{hasName, select, yes {{name}的诊断} other {诊断}}结果来准备这场会谈。",
+    // 表单上方的确认标签。价格与形式的文案只放在 result.sessionOffer，
+    // 本页面从那里读取。
+    offerLabel: "您申请的项目",
     anonymous: {
       name: "姓名 *",
       namePlaceholder: "张三",
@@ -404,12 +423,13 @@ const zhCN = {
       notice: "我们会通过您开始诊断时填写的邮箱与您联系。",
     },
     message: "想告诉我们的内容（选填）",
-    submit: "提交咨询申请",
+    submit: "提交会谈申请",
     submitting: "正在提交...",
     error: "未能提交申请，请重试。",
     success: {
       title: "申请已经提交",
-      description: "确认之后，我们会通过 {email} 与您联系。",
+      // 本表单不收款，因此明确说明接下来会发生什么。
+      description: "我们会通过 {email} 告知日程与付款方式。",
       home: "回到首页",
       viewResult: "再次查看诊断结果",
     },
