@@ -57,7 +57,7 @@ describe("session offer copy", () => {
       });
 
       it("uses no markup outside the rich-text copy", () => {
-        for (const key of ["heading", "priceLine", "vatNote", "format", "audience", "cta", "ctaNote"]) {
+        for (const key of ["heading", "priceLine", "vatNote", "format", "cta", "ctaNote"]) {
           expect(offerString(messages, key), `result.sessionOffer.${key}`).not.toMatch(/<\/?\w+>/);
         }
       });

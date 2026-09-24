@@ -39,7 +39,6 @@ export async function SessionOffer({ assessmentId }: { assessmentId: string }) {
           ))}
         </ul>
 
-        <p className="text-xs text-slate-500">{t("sessionOffer.audience")}</p>
 
         <div className="flex flex-col gap-2">
           <ConsultingCtaLink assessmentId={assessmentId} />

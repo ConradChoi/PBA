@@ -204,8 +204,6 @@ const en = {
         roadmap: "<b>A 90-day execution roadmap document</b> — delivered within 3 days of the session",
         scope: "A build scope and quote, if you need one",
       },
-      audience:
-        "Recommended for companies that are making money but stall the moment the founder steps away.",
       cta: "Apply for a Structure Diagnostic Session",
       ctaNote: "Once you apply, we will email you about scheduling and payment.",
     },
